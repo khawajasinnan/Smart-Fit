@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartFit Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#494454",
+                        "surface-tint": "#6d3bd7",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "background": "#fef7ff",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary": "#6b38d4",
+                        "surface": "#fef7ff",
+                        "primary-fixed": "#e9ddff",
+                        "tertiary-container": "#a76500",
+                        "primary-container": "#8455ef",
+                        "on-tertiary-fixed": "#2c1700",
+                        "inverse-on-surface": "#f5eefb",
+                        "on-secondary-container": "#76014e",
+                        "outline": "#7b7486",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e7e0ed",
+                        "surface-container-low": "#f8f1fe",
+                        "on-surface": "#1d1a23",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "inverse-primary": "#d0bcff",
+                        "surface-bright": "#fef7ff",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-container": "#f3ebf8",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#3d0026",
+                        "on-background": "#1d1a23",
+                        "inverse-surface": "#322f39",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cbc3d7",
+                        "on-secondary-fixed-variant": "#85145a",
+                        "secondary-fixed-dim": "#ffafd3",
+                        "secondary": "#a43073",
+                        "surface-container-high": "#ede5f3",
+                        "surface-container-highest": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "tertiary": "#855000",
+                        "secondary-container": "#fc79bd",
+                        "surface-dim": "#ded7e4",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffd8e7",
+                        "tertiary-fixed": "#ffdcbb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "unit": "8px",
+                        "container-margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "container-margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Space Grotesk"],
+                        "body-md": ["Space Grotesk"],
+                        "headline-md": ["Space Grotesk"],
+                        "label-md": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "display-lg": ["Space Grotesk"],
+                        "body-lg": ["Space Grotesk"],
+                        "button-label": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "button-label": ["16px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- Top AppBar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_40px_40px_rgba(0,0,0,0.05)] flex items-center justify-between px-container-margin-mobile h-16">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary text-headline-md">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-primary">SmartFit</h1>
+</div>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary text-headline-md">settings</span>
+</button>
+</header>
+<main class="pt-24 px-container-margin-mobile max-w-2xl mx-auto">
+<!-- Hero Greeting -->
+<section class="mb-stack-lg">
+<h2 class="font-display-lg text-display-lg text-on-background mb-unit">Hi Alex!</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Your style assistant is ready.</p>
+</section>
+<!-- Primary Actions: Bento Style -->
+<section class="grid grid-cols-2 gap-4 mb-stack-lg">
+<button class="col-span-2 relative h-48 rounded-lg overflow-hidden group active:scale-[0.98] transition-all duration-300">
+<img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A professional high-fashion studio shot of a person standing against a clean white background, wearing a modern tech-infused outfit. The lighting is soft and editorial, emphasizing clean lines and high-end minimalism. The mood is optimistic and futuristic, perfectly aligned with a premium digital fashion interface in light mode." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbMaukmz41WOzVZuueuF9hucCaM3KHtxX5EeXlR1ZCps4qydo0-ta0vR59kjqlowijXCXg75tiN8A3m-V6DdAJSHjbKaIClFZNJT-SLhh1L-cXmP3vfmWHUyscvVnjSCiZxGAUTVtQNUagwJCKsIeShRmgkX_IjPEhlck3fm1KWO8nQ0w_nIGdpUB1KQurOZzwu3UZxkfwJJv0XFbvW1nvqvM2rGcD7j8jcdfolc17ochIh5zUqTQu5LktLy1Z0bKYaZzTanC5_dY"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+<div class="absolute bottom-6 left-6 text-left">
+<span class="material-symbols-outlined text-white mb-2" style="font-variation-settings: 'FILL' 1;">photo_camera</span>
+<h3 class="font-headline-md text-headline-md text-white">Scan</h3>
+<p class="text-white/80 font-label-md">Update your body profile</p>
+</div>
+</button>
+<button class="relative h-40 rounded-lg overflow-hidden group active:scale-[0.98] transition-all duration-300">
+<div class="absolute inset-0 bg-primary-container"></div>
+<img class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-60 group-hover:scale-110 transition-transform duration-500" data-alt="Close up editorial photography of high-quality fabric textures and designer apparel in a bright, clinical white studio. The image captures the essence of luxury fashion with soft lavender highlights. The composition is airy and minimalist, reflecting a luminous editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDpeqEFOzwVVAIY5n2NSupvEEI6ZQRlFCt14jf9By1L6B7zKWJHPsalWFpJqZ_ao5EJ-kZ89nb1IwrTAFmxb44GeN1q3C4IBvP5x_5n5sV873GLAdUBiU0WP9CiaNl8tzfXyOxyqid6ovODrBIrkWEISLyz4UxGndWrBjKBFKFx7DgQrZ7l9dL8PlRbhf1ChwJ0364MVhzo74B8m6hSkHXfKr-hqvUoPBtWUTj_klk9Xospwh3zlWsOOtaOiDdDivNInPywKCuqio4"/>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-white">
+<span class="material-symbols-outlined text-[32px] mb-2">apparel</span>
+<span class="font-button-label text-button-label">Try On</span>
+</div>
+</button>
+<button class="relative h-40 rounded-lg overflow-hidden group active:scale-[0.98] transition-all duration-300">
+<div class="absolute inset-0 bg-secondary-container"></div>
+<img class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-60 group-hover:scale-110 transition-transform duration-500" data-alt="A high-end portrait of a person with a trendy, well-styled haircut in a bright, sun-drenched minimalist room. The lighting is soft and airy, creating a high-key look consistent with Gen-Z fashion editorials. The background is a clean lavender-tinted white, providing a serene and stylish atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsPZMRs2Q9aEOg4E3Mqap48C8CE6A9zt9iERxp15X8dJ3nufdB5WBKqIOwoeXyKaPsU6AJNFl0J2D87iB_A6rraG35GxqNEd6V1jkzzsEvxZyiAlkVu6p-ddy6AxTxWjpbGqEpxKPAaNQJfwG94ICUXqasbLWPj-KcRfRnvPlqEhBhrwQCUrTBXkZhbCffI4tqGXWSISrf2n3eq6_85nTMq6A0yi-xJk3KseATeKPwBfH9bq5K3UbsG9GTWgvTBRReRVrbFndTRdc"/>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-[32px] mb-2">face</span>
+<span class="font-button-label text-button-label">Hair</span>
+</div>
+</button>
+</section>
+<!-- Trending Horizontal Scroll -->
+<section class="mb-stack-lg -mx-container-margin-mobile">
+<div class="px-container-margin-mobile flex justify-between items-end mb-stack-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface">Trending</h3>
+<button class="text-primary font-label-md">See all</button>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-4 px-container-margin-mobile">
+<!-- Trend Card 1 -->
+<div class="flex-none w-64 bg-white rounded-lg shadow-[0px_10px_40px_rgba(0,0,0,0.05)] overflow-hidden">
+<img class="w-full h-72 object-cover" data-alt="An editorial fashion shot of a model wearing a street-style beige trench coat in a minimalist architectural setting. Bright natural light creates soft shadows, reinforcing a clean, airy, and high-end aesthetic. The style is modern, effortless, and highly curated for a fashion-forward audience." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCpmRPwOadI3hkvyHvKsdLyLy0QSK451N3ljzpGnAHtYxTIU8bAlqdh0k4Uk6fL1eMELMMkiMUsfy1RK3VdT9CCQOPkvG3RQKwETiZPJFW5kgnNQtMj5mzHqLsxaNZDLZCLlsmWhcmnBsdR3ZWHk1O5bkt7ep5by8-c-uLh6wWovYlytrt0x8GeveVwypRzuul1WbJxN1EqoFLCIxOdU5D0QkKo54vlu9MbwT7pZoJ5H-rmHQ8QpIgj2Waivhhsvuvk5tPvUMbhp44"/>
+<div class="p-4">
+<p class="font-label-md text-primary mb-1">STREETWEAR</p>
+<h4 class="font-body-lg text-body-lg font-semibold">Urban Explorer</h4>
+</div>
+</div>
+<!-- Trend Card 2 -->
+<div class="flex-none w-64 bg-white rounded-lg shadow-[0px_10px_40px_rgba(0,0,0,0.05)] overflow-hidden">
+<img class="w-full h-72 object-cover" data-alt="High-fidelity fashion photography of a vibrant summer outfit on a model. The background is a clean, neutral studio space that allows the bright colors of the clothing to pop. The lighting is luminous and clinical, creating a sense of premium clarity and energetic digital fluidity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCkrO0IVYIhHx-i_X_AESu1ia63GnfCi0xSdjyPafxTmNXADM2n-p8VdwzBtCDbeOA-GJCxI_kDie6Ryia0ZzsawoYHM9tRdRRQOXFiubLMAxhpCnJ2izgbJ9xxaE1RyzgwR3Oho36Uf4NI1oLOoIbnN30PW3ggLYGRsXeZTCtouyfT4RecwjpDOdv4Pluhhsoo8vVlimAe97tQTDCofwozL4WybxVwe8gQ7VkOc6imTTS9RO71dOk_Z3cn4gnympWJmt4r2hhhDVQ"/>
+<div class="p-4">
+<p class="font-label-md text-primary mb-1">SUMMER '24</p>
+<h4 class="font-body-lg text-body-lg font-semibold">Floral Dream</h4>
+</div>
+</div>
+<!-- Trend Card 3 -->
+<div class="flex-none w-64 bg-white rounded-lg shadow-[0px_10px_40px_rgba(0,0,0,0.05)] overflow-hidden">
+<img class="w-full h-72 object-cover" data-alt="Editorial image of a person wearing minimalist, high-quality knitwear. The setting is a bright, soft-textured interior with lavender accents. The photography is clean and realistic, capturing the soft texture of the clothes under diffuse, high-key lighting, maintaining a peaceful and premium mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDThYqGKL00CLqi6DD4o62TxQP1pO2dlCQGcH7nHTeOzS9vbJ7MABb5XbLPplsLaAGSpHn2T9j5gVbejCaKC_IdWRQCNRg52h15rfhI6Oxwvyj9ICibCYTiF55Pmd5zKP5d6_7sgmIeol43ZAD4XIZFYS4F2km69i6KymvuL108byhef31fkgfZBk2mkVxttbLx6-WwoDiu2QfEudfDTQjdfhO06WmwE5i2MggycjMKuvFlDkRo67qiVodAU9csPB9HvcY6Ip_HIDs"/>
+<div class="p-4">
+<p class="font-label-md text-primary mb-1">MINIMALISM</p>
+<h4 class="font-body-lg text-body-lg font-semibold">Cloud Knit</h4>
+</div>
+</div>
+</div>
+</section>
+<!-- For You List -->
+<section class="mb-stack-lg">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-stack-sm">For You</h3>
+<div class="space-y-4">
+<!-- Match 1 -->
+<div class="flex items-center p-4 bg-white rounded-lg shadow-sm">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-none">
+<img class="w-full h-full object-cover" data-alt="A close-up portrait of a stylish person in a high-key lit environment. The aesthetic is clean, clinical, and high-fashion. The soft lavender background and pristine lighting highlight the person's features and modern style, creating a sense of personal curation and effortless cool." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6mm2dH2WIAm6kfFctCrbI6eDX_wJa_ZUMVq1oh3htC9BIrgfrp81spLe88WZopS3PIMzz8AIBA6D2A_TIeQaCXtY5vdSu-WV_yRZUWZIuacS8qoKVxbB8K8u6n-LgB0vj7uoja92IHh4hPhboC4E76fEO8yw0gwwWK5B5aXuFTXGHOIx0pQeHNK3Lx8RRKcxGwjKmRCqYhdDUa5cvco91D_EZp2W4qGo2f-ss-0lWLabwGLacWIwiMy5UaandS_lFDLLa6-hflWg"/>
+</div>
+<div class="ml-4 flex-grow">
+<h4 class="font-headline-md text-headline-md text-base leading-tight">Silver Silk Slip</h4>
+<p class="font-body-md text-on-surface-variant text-sm">Perfect for your body shape</p>
+</div>
+<div class="text-right">
+<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-md">98% Match</span>
+</div>
+</div>
+<!-- Match 2 -->
+<div class="flex items-center p-4 bg-white rounded-lg shadow-sm">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-none">
+<img class="w-full h-full object-cover" data-alt="Detailed photography of a modern, stylish jacket displayed in a luminous, high-end showroom. The lighting is focused and crisp, emphasizing the quality of the material. The overall vibe is minimalist and sophisticated, following a luminous editorial visual language." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA6PqY-6yi-QnsSUQ2JBQsn_qEohXr4Rl6AtafuSlLXSgO_Qk5AnTQnB_bz3BMTlLkZLTHsGGmlNRnUoIn_kV2OI_5pIzaBx9wHkhXx25-L62Pp1BD_ezLgUc9VQWmvjkrxCQ-RzoSnXmJIcz2JBvnEynqnJ59Dyej9LEeCbMq6z-OgyH3dG4R7z28z24kqp4ir5sWbWaqi0N7E4lEJN1lwCxGEGGKNA4CvUJ3UBAyg9-sl12ziKjelZsGedvv0D86o1EzLexyF-tI"/>
+</div>
+<div class="ml-4 flex-grow">
+<h4 class="font-headline-md text-headline-md text-base leading-tight">Oversized Blazer</h4>
+<p class="font-body-md text-on-surface-variant text-sm">Matches your skin tone</p>
+</div>
+<div class="text-right">
+<span class="inline-block px-3 py-1 bg-primary-container text-white rounded-full font-label-md">94% Match</span>
+</div>
+</div>
+<!-- Match 3 -->
+<div class="flex items-center p-4 bg-white rounded-lg shadow-sm">
+<div class="w-20 h-20 rounded-lg overflow-hidden flex-none">
+<img class="w-full h-full object-cover" data-alt="Fashion portrait of a person in high-quality casual wear, photographed in a bright, minimalist studio. The mood is relaxed yet premium. Light mode colors and soft shadows dominate the composition, reinforcing the optimistic and airy aesthetic of the brand." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIkZaziLIEYtTk7GQ0nYYNZDrmtxa8z1N3hDgyB9Xw-BtuZjaRsex3Z1gZyFFLNNzcnxxPNrc6ULd136BsCAgPM5UmqLQocTr37rKaaV5Cai9yuVr_Ivf5VyuAgXt9typAZFqX5hKVW0nG2ZEdL9OeJBMTmVQMxCkTeAQi8__s7mj23kybATtTCuh7KXyhUaCodqy6bKLUSMf59gJN8oNJ0cspsDTkA6Ddxh_na168--_YPcPQIXSjbf8Nh1pXuPWJyGekl7L-O-M"/>
+</div>
+<div class="ml-4 flex-grow">
+<h4 class="font-headline-md text-headline-md text-base leading-tight">V-Neck Cashmere</h4>
+<p class="font-body-md text-on-surface-variant text-sm">Trending in your area</p>
+</div>
+<div class="text-right">
+<span class="inline-block px-3 py-1 bg-surface-variant text-on-surface-variant rounded-full font-label-md">89% Match</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 py-3 pb-safe z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_-10px_40px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined">apparel</span>
+<span class="font-label-md text-label-md">Try-On</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">AI Styles</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md">Saved</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 transition-transform">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Profile Setup - SmartFit</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "secondary-fixed": "#ffd9e4",
+                    "on-primary-fixed-variant": "#5516be",
+                    "surface-container-highest": "#e7e0ed",
+                    "on-primary-fixed": "#23005c",
+                    "on-error": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-dim": "#ded7e4",
+                    "on-tertiary-fixed-variant": "#673d00",
+                    "tertiary-fixed-dim": "#ffb869",
+                    "surface-container": "#f3ebf8",
+                    "secondary": "#b4136d",
+                    "on-error-container": "#93000a",
+                    "surface": "#fef7ff",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#fffbff",
+                    "background": "#fef7ff",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#1d1a23",
+                    "on-surface-variant": "#494454",
+                    "surface-tint": "#6d3bd7",
+                    "outline-variant": "#cbc3d7",
+                    "primary-container": "#8455ef",
+                    "inverse-on-surface": "#f5eefb",
+                    "on-tertiary-fixed": "#2c1700",
+                    "error": "#ba1a1a",
+                    "surface-container-high": "#ede5f3",
+                    "inverse-surface": "#322f39",
+                    "secondary-container": "#fd56a7",
+                    "primary-fixed-dim": "#d0bcff",
+                    "primary-fixed": "#e9ddff",
+                    "primary": "#6b38d4",
+                    "outline": "#7b7486",
+                    "tertiary-container": "#a76500",
+                    "surface-variant": "#e7e0ed",
+                    "inverse-primary": "#d0bcff",
+                    "surface-bright": "#fef7ff",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#3e0022",
+                    "on-secondary-container": "#600037",
+                    "tertiary": "#855000",
+                    "tertiary-fixed": "#ffdcbb",
+                    "surface-container-low": "#f8f1fe",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed-dim": "#ffb0cd",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary-fixed-variant": "#8c0053",
+                    "on-surface": "#1d1a23"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "margin-mobile": "24px",
+                    "container-padding": "24px",
+                    "unit": "8px"
+            },
+            "fontFamily": {
+                    "display-lg": [
+                            "Space Grotesk"
+                    ],
+                    "body-md": [
+                            "Inter"
+                    ],
+                    "body-lg": [
+                            "Inter"
+                    ],
+                    "headline-lg": [
+                            "Space Grotesk"
+                    ],
+                    "quote-vibrant": [
+                            "Space Grotesk"
+                    ],
+                    "label-caps": [
+                            "Inter"
+                    ],
+                    "headline-md": [
+                            "Space Grotesk"
+                    ]
+            },
+            "fontSize": {
+                    "display-lg": [
+                            "48px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "letterSpacing": "-0.02em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "body-md": [
+                            "16px",
+                            {
+                                    "lineHeight": "1.5",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "body-lg": [
+                            "18px",
+                            {
+                                    "lineHeight": "1.6",
+                                    "fontWeight": "400"
+                            }
+                    ],
+                    "headline-lg": [
+                            "32px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "600"
+                            }
+                    ],
+                    "quote-vibrant": [
+                            "28px",
+                            {
+                                    "lineHeight": "1.1",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "label-caps": [
+                            "12px",
+                            {
+                                    "lineHeight": "1",
+                                    "letterSpacing": "0.1em",
+                                    "fontWeight": "700"
+                            }
+                    ],
+                    "headline-md": [
+                            "24px",
+                            {
+                                    "lineHeight": "1.2",
+                                    "fontWeight": "600"
+                            }
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide scrollbar for bento scrollers */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background min-h-screen relative overflow-x-hidden text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Luminous Ambient Background Elements -->
+<div class="fixed top-[-10%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-primary-fixed-dim/30 blur-[100px] pointer-events-none z-0"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[70vw] h-[70vw] rounded-full bg-secondary-fixed-dim/20 blur-[120px] pointer-events-none z-0"></div>
+<!-- Main Content Canvas (Onboarding/Linear Flow - Shell Suppressed) -->
+<main class="relative z-10 max-w-lg mx-auto px-margin-mobile pt-16 pb-32 flex flex-col gap-12">
+<!-- Header -->
+<header class="flex flex-col gap-2">
+<button aria-label="Go back" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-container-high text-on-surface-variant hover:bg-surface-variant transition-colors mb-4">
+<span class="material-symbols-outlined text-[24px]">arrow_back</span>
+</button>
+<h1 class="font-display-lg text-display-lg text-on-background">Tell us about you</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Personalize your virtual try-on experience.</p>
+</header>
+<!-- Vibrant Quote Card -->
+<section class="bg-surface/70 dark:bg-surface-dim/70 backdrop-blur-xl border border-white/60 rounded-xl p-8 shadow-[0_20px_40px_rgba(139,92,246,0.08)] relative overflow-hidden flex items-center justify-center text-center">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 pointer-events-none"></div>
+<h2 class="font-quote-vibrant text-quote-vibrant text-primary relative z-10">"Confidence starts here."</h2>
+</section>
+<!-- Realistic Body Prototype Icons (Horizontal Bento Scroll) -->
+<section class="flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<h3 class="font-headline-md text-headline-md text-on-background">Base Model</h3>
+</div>
+<div class="flex gap-gutter overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory -mx-margin-mobile px-margin-mobile">
+<!-- Model 1 (Inactive) -->
+<button class="snap-start shrink-0 w-[140px] aspect-[3/4] relative rounded-lg overflow-hidden border border-white/40 bg-surface-container/50 shadow-sm transition-transform hover:scale-[1.02]">
+<img alt="Slim model prototype" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="A highly realistic, minimalist fashion sketch of a slender, androgynous human silhouette standing in a relaxed pose. The figure is rendered in light, ethereal lines against a pristine white background. The aesthetic is modern, luminous, and premium, utilizing soft lavender and blush pink lighting accents to create a clean, Gen-Z friendly vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuphdFquT_hH5LWg8d8Rxi-1SSSIzh-VHxs5VBO04-Z7NuQiEVJhKIAF4X8Q2sGcOtckKAJzesLqfI9zvM7tSmr99iHotPa0P6YIv4-0zV0QQEb3KfOSMLJHYMzDzpdFzvQbKdRZqTAot_POE5zdxlmqJIjX9OajyEVvcYBg85QkSy-p2sir3-yF5nAG3v5fjeOGDGNxzEYQZWUcQOCgVufcajKP4nVUOyq3c1DC4ok449HDNRXMMckZrDGDeGL1avYrckMn8cUHw"/>
+</button>
+<!-- Model 2 (Active/Selected) -->
+<button class="snap-start shrink-0 w-[140px] aspect-[3/4] relative rounded-lg overflow-hidden border-2 border-primary bg-primary-container/10 shadow-[0_10px_30px_rgba(107,56,212,0.15)] transition-transform scale-[1.02]">
+<div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-primary flex items-center justify-center z-20 shadow-md">
+<span class="material-symbols-outlined text-[16px] text-on-primary" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+<div class="absolute inset-0 bg-primary/5 z-10 pointer-events-none"></div>
+<img alt="Athletic model prototype" class="w-full h-full object-cover" data-alt="A photorealistic, high-fashion render of a muscular, athletic human form in a neutral standing position. The lighting is soft and diffused, highlighting the contours of the body with gentle glowing highlights. The background is a frosted glass texture, contributing to a premium, luminous light-mode design style. Colors are muted with subtle hints of electric purple." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFW7zVIVuocE4-0ZVPHE-YKai2e2n3isJvwJsRsJZq25MBXKVz6t-ClgJGTb4Yrnl-sqX8ktmwVT6uCtJQ36GxYXBLo_4Nsq2Z_eg6frcvZvqUuwpQnklvT_5UrM17mW17Kf0PAsphf0JntEgLwQa1lzQm2w1i69qmSDhlx30V2Hqg4_fDU2xpA3vRJGajI-X_KCJyG-Lj-ghfqfcPXS6elG5KbFqVzK4uZ8tD6YGev_T8OeP6hB9BZwBw1pTEai3t5Dqh10qYt7s"/>
+</button>
+<!-- Model 3 (Inactive) -->
+<button class="snap-start shrink-0 w-[140px] aspect-[3/4] relative rounded-lg overflow-hidden border border-white/40 bg-surface-container/50 shadow-sm transition-transform hover:scale-[1.02]">
+<img alt="Curvy model prototype" class="w-full h-full object-cover opacity-80 mix-blend-multiply" data-alt="An elegant, fashion-forward 3D illustration of a curvy, full-figured human silhouette. The rendering style is sleek and modern, utilizing semi-transparent materials that mimic frosted glass. The scene is illuminated by soft, ambient studio lighting in a light-mode setting, creating a sophisticated and welcoming atmosphere typical of a luxury editorial layout." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqv-QT1_pKdeloLO_02uD3Hu801qcMYGa8qxoraISsxgWDrF_pW1lsx_xtlIuoMpakVNLjEh8F7Nd3-JBYpfVz7gK3mozkH_IzTGZrJcSR-hioZD8rxtiTwPAEe-n-XiBuVvgYidwDBOk9oeadNmW4WVS5XzIlTipviAGYwWimHgFs43QS8wLfXtarfcubC9KPMiB9gHPtwo7eebs67nWLkSf_uGXrvjsxqXOQSejx5XmARmcuh-syazx46WIpZEVNqcfOdX1z8dE"/>
+</button>
+</div>
+</section>
+<!-- Height and Weight Sliders (Glassmorphism Cards) -->
+<section class="flex flex-col gap-6">
+<!-- Height Slider -->
+<div class="bg-surface/60 backdrop-blur-2xl border border-white/50 rounded-xl p-6 shadow-[0_10px_30px_rgba(139,92,246,0.05)] flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none rounded-xl"></div>
+<div class="flex justify-between items-center relative z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[20px]">height</span>
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Height</label>
+</div>
+<span class="font-headline-md text-headline-md text-on-background">5' 8"</span>
+</div>
+<!-- Custom Visual Slider -->
+<div class="relative w-full h-10 flex items-center z-10">
+<div class="absolute w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-[60%] h-full bg-primary/80"></div>
+</div>
+<!-- Thumb -->
+<div class="absolute left-[60%] w-6 h-6 bg-surface shadow-[0_4px_12px_rgba(107,56,212,0.3)] rounded-full border border-outline-variant -ml-3 flex items-center justify-center cursor-pointer">
+<div class="w-2 h-2 bg-primary rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Weight Slider -->
+<div class="bg-surface/60 backdrop-blur-2xl border border-white/50 rounded-xl p-6 shadow-[0_10px_30px_rgba(139,92,246,0.05)] flex flex-col gap-4 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none rounded-xl"></div>
+<div class="flex justify-between items-center relative z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">monitor_weight</span>
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase">Weight</label>
+</div>
+<span class="font-headline-md text-headline-md text-on-background">140 lbs</span>
+</div>
+<!-- Custom Visual Slider -->
+<div class="relative w-full h-10 flex items-center z-10">
+<div class="absolute w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div class="w-[45%] h-full bg-secondary/80"></div>
+</div>
+<!-- Thumb -->
+<div class="absolute left-[45%] w-6 h-6 bg-surface shadow-[0_4px_12px_rgba(180,19,109,0.3)] rounded-full border border-outline-variant -ml-3 flex items-center justify-center cursor-pointer">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Aesthetic Core Selector -->
+<section class="flex flex-col gap-5">
+<h3 class="font-headline-md text-headline-md text-on-background">Aesthetic Core</h3>
+<div class="flex flex-wrap gap-3">
+<!-- Inactive Chip -->
+<button class="px-6 py-3 rounded-full bg-surface-container border border-outline-variant/30 font-body-lg text-body-lg text-on-surface hover:bg-surface-container-high transition-colors shadow-sm">
+                    Streetwear
+                </button>
+<!-- Inactive Chip -->
+<button class="px-6 py-3 rounded-full bg-surface-container border border-outline-variant/30 font-body-lg text-body-lg text-on-surface hover:bg-surface-container-high transition-colors shadow-sm">
+                    Clean
+                </button>
+<!-- Active Chip (Luxury) -->
+<button class="px-6 py-3 rounded-full bg-primary text-on-primary font-body-lg text-body-lg shadow-[0_10px_25px_rgba(107,56,212,0.35)] relative overflow-hidden group">
+<div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+<span class="relative z-10 flex items-center gap-2">
+                        Luxury
+                        <span class="material-symbols-outlined text-[18px]">diamond</span>
+</span>
+</button>
+</div>
+</section>
+</main>
+<!-- Sticky Bottom Action Area -->
+<div class="fixed bottom-0 left-0 w-full p-margin-mobile bg-gradient-to-t from-background via-background/90 to-transparent z-40 pb-8">
+<div class="max-w-lg mx-auto">
+<button class="w-full bg-primary text-on-primary rounded-full py-4 font-headline-md text-headline-md shadow-[0_15px_40px_rgba(107,56,212,0.4)] hover:opacity-90 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
+                Go
+                <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</div>
+</body></html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartFit Outfit Analysis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .glass-effect {
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+    /* Donut Chart Animation-less fallback */
+    .conic-gradient-score {
+      background: conic-gradient(theme('colors.primary') 85%, theme('colors.surface-container-highest') 0);
+    }
+  </style>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+                  "on-tertiary": "#ffffff",
+                  "on-surface-variant": "#494454",
+                  "surface-tint": "#6d3bd7",
+                  "error-container": "#ffdad6",
+                  "on-secondary": "#ffffff",
+                  "background": "#fef7ff",
+                  "on-tertiary-container": "#fffbff",
+                  "surface-container-lowest": "#ffffff",
+                  "on-error-container": "#93000a",
+                  "primary": "#6b38d4",
+                  "surface": "#fef7ff",
+                  "primary-fixed": "#e9ddff",
+                  "tertiary-container": "#a76500",
+                  "primary-container": "#8455ef",
+                  "on-tertiary-fixed": "#2c1700",
+                  "inverse-on-surface": "#f5eefb",
+                  "on-secondary-container": "#76014e",
+                  "outline": "#7b7486",
+                  "error": "#ba1a1a",
+                  "surface-variant": "#e7e0ed",
+                  "surface-container-low": "#f8f1fe",
+                  "on-surface": "#1d1a23",
+                  "on-tertiary-fixed-variant": "#673d00",
+                  "inverse-primary": "#d0bcff",
+                  "surface-bright": "#fef7ff",
+                  "primary-fixed-dim": "#d0bcff",
+                  "surface-container": "#f3ebf8",
+                  "on-primary-container": "#fffbff",
+                  "on-secondary-fixed": "#3d0026",
+                  "on-background": "#1d1a23",
+                  "inverse-surface": "#322f39",
+                  "on-error": "#ffffff",
+                  "outline-variant": "#cbc3d7",
+                  "on-secondary-fixed-variant": "#85145a",
+                  "secondary-fixed-dim": "#ffafd3",
+                  "secondary": "#a43073",
+                  "surface-container-high": "#ede5f3",
+                  "surface-container-highest": "#e7e0ed",
+                  "on-primary-fixed": "#23005c",
+                  "on-primary-fixed-variant": "#5516be",
+                  "tertiary-fixed-dim": "#ffb869",
+                  "tertiary": "#855000",
+                  "secondary-container": "#fc79bd",
+                  "surface-dim": "#ded7e4",
+                  "on-primary": "#ffffff",
+                  "secondary-fixed": "#ffd8e7",
+                  "tertiary-fixed": "#ffdcbb"
+          },
+          "borderRadius": {
+                  "DEFAULT": "1rem",
+                  "lg": "2rem",
+                  "xl": "3rem",
+                  "full": "9999px"
+          },
+          "spacing": {
+                  "gutter": "16px",
+                  "stack-md": "16px",
+                  "stack-sm": "8px",
+                  "unit": "8px",
+                  "container-margin-mobile": "20px",
+                  "stack-lg": "32px",
+                  "container-margin-desktop": "40px"
+          },
+          "fontFamily": {
+                  "headline-lg-mobile": ["Space Grotesk"],
+                  "body-md": ["Space Grotesk"],
+                  "headline-md": ["Space Grotesk"],
+                  "label-md": ["Space Grotesk"],
+                  "headline-lg": ["Space Grotesk"],
+                  "display-lg": ["Space Grotesk"],
+                  "body-lg": ["Space Grotesk"],
+                  "button-label": ["Space Grotesk"]
+          },
+          "fontSize": {
+                  "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                  "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                  "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                  "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                  "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                  "display-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                  "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                  "button-label": ["16px", {"lineHeight": "20px", "fontWeight": "500"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_40px_40px_rgba(0,0,0,0.05)] h-16 flex items-center justify-between px-container-margin-mobile">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform text-on-surface-variant">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-primary">SmartFit</h1>
+</div>
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform text-on-surface-variant">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="flex-grow pt-24 pb-32 px-container-margin-mobile max-w-2xl mx-auto w-full">
+<!-- Hero Analysis Section -->
+<section class="flex flex-col items-center justify-center mb-stack-lg">
+<div class="relative w-64 h-64 flex items-center justify-center">
+<!-- Ring Chart -->
+<div class="absolute inset-0 rounded-full conic-gradient-score"></div>
+<div class="absolute inset-4 rounded-full bg-surface shadow-inner flex flex-col items-center justify-center">
+<span class="font-display-lg text-display-lg text-primary">85%</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Overall Match</span>
+</div>
+</div>
+<p class="mt-stack-md font-body-lg text-body-lg text-center text-on-surface-variant">
+        Your outfit is highly cohesive! A few small tweaks could make it perfect.
+      </p>
+</section>
+<!-- Metrics Grid -->
+<section class="space-y-stack-md mb-stack-lg">
+<div class="bg-white p-6 rounded-lg shadow-[0px_40px_40px_rgba(0,0,0,0.05)] border border-surface-variant">
+<div class="space-y-6">
+<!-- Fit Metric -->
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-md text-label-md text-on-surface">Fit</span>
+<span class="font-label-md text-label-md text-primary">92%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 92%"></div>
+</div>
+</div>
+<!-- Color Metric -->
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-md text-label-md text-on-surface">Color</span>
+<span class="font-label-md text-label-md text-primary">78%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 78%"></div>
+</div>
+</div>
+<!-- Style Metric -->
+<div>
+<div class="flex justify-between items-center mb-2">
+<span class="font-label-md text-label-md text-on-surface">Style</span>
+<span class="font-label-md text-label-md text-primary">85%</span>
+</div>
+<div class="w-full bg-surface-container-highest rounded-full h-2">
+<div class="bg-primary h-2 rounded-full" style="width: 85%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Suggestions Section -->
+<section class="mb-stack-lg">
+<h2 class="font-headline-md text-headline-md mb-stack-md">Smart Suggestions</h2>
+<div class="grid grid-cols-2 gap-4">
+<!-- Suggestion Card 1 -->
+<div class="bg-white rounded-lg overflow-hidden shadow-[0px_10px_40px_rgba(0,0,0,0.05)] group">
+<div class="relative h-48">
+<img alt="Suggestion" class="w-full h-full object-cover" data-alt="A high-end editorial product shot of a minimalist cream-colored leather jacket hanging against a soft lavender backdrop. The lighting is diffused and professional, highlighting the buttery texture of the leather. This clean, modern image follows a sophisticated light-mode aesthetic, emphasizing premium fashion quality and soft, optimistic tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCU1ApnWdnitRHJ84V-11L1Ctz4bAWZK9IAn2TMkWWWSs7nj2U-9dgPuhGLa44F1wFG0hy_N9fKwuA1ESaeb5kp1AdDGlAV3ATUhMupv-Y-lz1uAlD2SW1qfl2L_-etHwp2xKOrg0jewDglE1tetDRhvQDy48XYFShJGjUcbheDk5Jdf8qv2GJTW_rAFpwXTrHZ2yyQbTNwGAgOIntu0lcLJf0jWmKs1NQhHvxD6AB9DDORe1N2aab-Cy7NgbxD3CBHuxS-Vs1nb_g"/>
+<div class="absolute top-2 right-2 bg-secondary-container text-on-secondary-container px-2 py-1 rounded-full text-[10px] font-bold">TOP PICK</div>
+</div>
+<div class="p-3">
+<h3 class="font-label-md text-label-md text-on-surface truncate">Cream Leather Jacket</h3>
+<p class="text-xs text-on-surface-variant mb-3">Improves Color Balance</p>
+<button class="w-full py-2 rounded-full bg-surface-container text-primary font-button-label text-label-md active:scale-95 transition-transform">View Details</button>
+</div>
+</div>
+<!-- Suggestion Card 2 -->
+<div class="bg-white rounded-lg overflow-hidden shadow-[0px_10px_40px_rgba(0,0,0,0.05)] group">
+<div class="relative h-48">
+<img alt="Suggestion" class="w-full h-full object-cover" data-alt="A studio photography shot of sleek, modern sneakers in a vibrant electric purple and white colorway. The shoes are positioned dynamically on a pure white surface with soft, hovering shadows beneath them. The overall style is airy and Gen-Z focused, using a crisp, high-key lighting setup that aligns with a premium fashion lookbook." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCUctbpBoYGIbAMsyERKnSzGxWSAS4LlO6Alf0h-_kFNevBBrCm5WIEI060SEM6thlh2Cq9G2YOOg6v8D6VuxJFnuZXDljGXs5z0zBS4dGLFfnNiVHnuNWeNGALGbz7uRiyeWBCcG5TH-Nds9iKR9LymOc_PZME3ydrbxfQV3v6LgBWylyH16MSM8ui5GYIarCoi8QuIEKWa2Zewy-iWdjtfN3ppqEM_oLQwS2R35E2A49tiqcFWgZ9gamuq_O1ht1y-VW3DG9tH6w"/>
+</div>
+<div class="p-3">
+<h3 class="font-label-md text-label-md text-on-surface truncate">Electric Low-Tops</h3>
+<p class="text-xs text-on-surface-variant mb-3">Adds Style Contrast</p>
+<button class="w-full py-2 rounded-full bg-surface-container text-primary font-button-label text-label-md active:scale-95 transition-transform">View Details</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Actions -->
+<div class="flex gap-4 mb-12">
+<button class="flex-1 bg-secondary-container text-on-secondary-container py-4 rounded-lg font-button-label text-button-label shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">check_circle</span>
+        Apply
+      </button>
+<button class="flex-1 bg-white border border-outline-variant text-on-surface py-4 rounded-lg font-button-label text-button-label shadow-sm active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined">bookmark</span>
+        Save
+      </button>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_-10px_40px_rgba(0,0,0,0.05)] flex justify-around items-center px-2 py-3 pb-safe">
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors cursor-pointer px-4 py-1">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1 active:scale-90 transition-transform cursor-pointer">
+<span class="material-symbols-outlined">apparel</span>
+<span class="font-label-md text-label-md">Try-On</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors cursor-pointer px-4 py-1">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">AI Styles</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors cursor-pointer px-4 py-1">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md">Saved</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors cursor-pointer px-4 py-1">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</div>
+</nav>
+</body></html>

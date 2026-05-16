@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Saved - SmartFit Vault</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#494454",
+                        "surface-tint": "#6d3bd7",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "background": "#fef7ff",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary": "#6b38d4",
+                        "surface": "#fef7ff",
+                        "primary-fixed": "#e9ddff",
+                        "tertiary-container": "#a76500",
+                        "primary-container": "#8455ef",
+                        "on-tertiary-fixed": "#2c1700",
+                        "inverse-on-surface": "#f5eefb",
+                        "on-secondary-container": "#76014e",
+                        "outline": "#7b7486",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e7e0ed",
+                        "surface-container-low": "#f8f1fe",
+                        "on-surface": "#1d1a23",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "inverse-primary": "#d0bcff",
+                        "surface-bright": "#fef7ff",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-container": "#f3ebf8",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#3d0026",
+                        "on-background": "#1d1a23",
+                        "inverse-surface": "#322f39",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cbc3d7",
+                        "on-secondary-fixed-variant": "#85145a",
+                        "secondary-fixed-dim": "#ffafd3",
+                        "secondary": "#a43073",
+                        "surface-container-high": "#ede5f3",
+                        "surface-container-highest": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "tertiary": "#855000",
+                        "secondary-container": "#fc79bd",
+                        "surface-dim": "#ded7e4",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffd8e7",
+                        "tertiary-fixed": "#ffdcbb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "unit": "8px",
+                        "container-margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "container-margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Space Grotesk"],
+                        "body-md": ["Space Grotesk"],
+                        "headline-md": ["Space Grotesk"],
+                        "label-md": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "display-lg": ["Space Grotesk"],
+                        "body-lg": ["Space Grotesk"],
+                        "button-label": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "button-label": ["16px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .masonry-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .masonry-item:nth-child(even) {
+            margin-top: 32px;
+        }
+        .glass-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_40px_40px_rgba(0,0,0,0.05)]">
+<div class="flex items-center justify-between px-container-margin-mobile h-16">
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-primary">SmartFit</h1>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-primary">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-container-margin-mobile">
+<!-- Page Header -->
+<div class="mb-stack-lg">
+<h2 class="font-headline-lg text-headline-lg text-on-surface mb-2">Your Vault</h2>
+<p class="font-body-md text-on-surface-variant">The styles you love, curated in one place.</p>
+</div>
+<!-- Category Chips -->
+<div class="flex gap-stack-sm mb-stack-lg overflow-x-auto pb-2 no-scrollbar">
+<button class="px-6 py-2 rounded-full bg-primary text-on-primary font-label-md text-label-md whitespace-nowrap active:scale-95 transition-transform">
+                All
+            </button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-variant active:scale-95 transition-transform">
+                Hair
+            </button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-variant active:scale-95 transition-transform">
+                Outfits
+            </button>
+<button class="px-6 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-label-md text-label-md whitespace-nowrap hover:bg-surface-variant active:scale-95 transition-transform">
+                Accessories
+            </button>
+</div>
+<!-- Masonry Grid of Saved Content -->
+<div class="masonry-grid">
+<!-- Item 1 -->
+<div class="masonry-item group relative bg-white rounded-lg overflow-hidden shadow-[0px_10px_40px_rgba(0,0,0,0.05)] active:scale-95 transition-transform">
+<img class="w-full h-64 object-cover" data-alt="A high-fashion studio photograph of a young woman posing in minimalist streetwear. The lighting is bright and airy, typical of a modern fashion editorial, with a clean lavender background. She wears a structured oversized blazer and high-waisted trousers in a soft tonal palette. The mood is confident, calm, and effortless, perfectly aligned with the Gen-Z minimalist aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD0UkM_XBU3TyrljsNeJRAFHB68-w4Rr34rrDfJNVgg9bSzITnzKViogvsTntli6ZTVWpc9qHVhidm2zyZ9iAflGjgHF9gfcvdt4hZVnSQsjoDk1fFYcrAw-BW_pP1D65jrJUvqWA4uOoIyQzUuwyeZgASzPNTMMggx-2OZMCr4dx0_gH5XakFTg5EQ6tXJY4LgFn7l4oddV38KI9JtTP9M4nvO002giwJ7owQHietiLB-1OfWGUr59OhY8NA4za1eU_IxKiN9pm40"/>
+<div class="p-4 bg-white">
+<p class="font-label-md text-label-md text-on-surface">Street Minimalism</p>
+<span class="text-[12px] text-on-surface-variant">Saved 2h ago</span>
+</div>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full">
+<span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<!-- Item 2 -->
+<div class="masonry-item group relative bg-white rounded-lg overflow-hidden shadow-[0px_10px_40px_rgba(0,0,0,0.05)] active:scale-95 transition-transform">
+<img class="w-full h-80 object-cover" data-alt="Close-up editorial portrait of a person showcasing a sleek, modern hair styling. The aesthetic is clean and high-end, featuring soft natural lighting that accentuates the texture of the hair. The background is a soft, out-of-focus lavender gradient. The overall feeling is one of professional beauty and modern salon elegance, using a soft-focus luminous style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBJJbSqtZx2ycr5B1-91CSUYLAFt0zLDcBomV8hTrwqP8-YaHQFSPRubAxOGiblqdq7lZ8WDVjk6EKheVn6mDoZvx2m761dS7RuW5mjFeCtU1RzC820DGhj4kOowpbBJuJX6Te3LRhztERsGejU8ZCuNgQlqg7HvF2OrO5XEjJoDuzJaC5eNkl8s4RY6_srlKsuklzxVQUacHpEM9jkCdOzj_0vxqMMLHpMPcftk4ECH55W5r97QGSxmHBHemHKN27sMeNSdrCDfNs"/>
+<div class="p-4 bg-white">
+<p class="font-label-md text-label-md text-on-surface">Sleek Tones</p>
+<span class="text-[12px] text-on-surface-variant">Hair Vault</span>
+</div>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full">
+<span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<!-- Item 3 -->
+<div class="masonry-item group relative bg-white rounded-lg overflow-hidden shadow-[0px_10px_40px_rgba(0,0,0,0.05)] active:scale-95 transition-transform">
+<img class="w-full h-80 object-cover" data-alt="A vibrant outdoor fashion shot featuring a model in a trendy layered outfit. The scene is illuminated by the golden hour sun, creating a warm, luminous editorial feel. The clothing colors are sophisticated pastel hues that complement a clean, clinical yet artistic environment. The composition is dynamic and youthful, highlighting a blend of high-end style and casual comfort." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCuMM7d0k3wz3Y7G-LgyF4dejfcfjP66x7ou4JV8pDYT4XoGHAOpERMiZLgEyWcnvqx-xzWWxazPpSU3jzPHYBQG6v8UKFgwkuHNI8Ndzg5Xs8H6iPOiYr2fmY__Noa2-ie6eCtIs_vvc2jgS23Hpsdpc23Ny_-_mtbhpQhB_43qsNfsvb7bGR8JBMFjO2rRx2BpEkRW3U0CZLVMSuj0NGZtUhSjhm0iMmZZ8easubuYSAcxX3uc4fHnBd2SjKepIXmG2pzLlbCttc"/>
+<div class="p-4 bg-white">
+<p class="font-label-md text-label-md text-on-surface">Autumn Layers</p>
+<span class="text-[12px] text-on-surface-variant">Saved yesterday</span>
+</div>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full">
+<span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<!-- Item 4 -->
+<div class="masonry-item group relative bg-white rounded-lg overflow-hidden shadow-[0px_10px_40px_rgba(0,0,0,0.05)] active:scale-95 transition-transform">
+<img class="w-full h-64 object-cover" data-alt="An artistic high-angle shot of designer footwear arranged neatly on a pristine marble surface. The lighting is soft and diffused, creating a luxurious glassmorphism feel with subtle reflections. The color palette is composed of soft cream and lavender tones. This fashion accessory photograph evokes a sense of high-end curation and refined modern taste." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGXaoWCHH3kf4yXrMwtbTxFq8j6PaScDrFXLVyTDsSZQrIOVF_oO9Kej461rf_yQkN-Uh0gstE4NAqV8eyS8xL-ukMw81k3fhSO903SydB1uvXD63bg01Bok6AaHOR2nzjwdo7c54oye_xr2E_2zeuFThqhjHKiEw76VLYQbo7tfV9V4rAnyJtvtAGKmtCzvJv0NNwJrsmd7TweQHmHwltnKUx16QLXYTCwHA5fgYFyTOXG7lH8agbMEzAdXaEXDJ3TNCk9VTrBoo"/>
+<div class="p-4 bg-white">
+<p class="font-label-md text-label-md text-on-surface">Platform Edge</p>
+<span class="text-[12px] text-on-surface-variant">Accessories</span>
+</div>
+<button class="absolute top-3 right-3 bg-white/80 backdrop-blur-md p-1.5 rounded-full">
+<span class="material-symbols-outlined text-[18px] text-secondary" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Floating Action Button -->
+<button class="fixed bottom-24 right-6 bg-secondary-container text-on-secondary-container px-6 py-4 rounded-xl shadow-lg flex items-center gap-2 active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined">document_scanner</span>
+<span class="font-button-label text-button-label">Scan</span>
+</button>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 py-3 pb-safe bg-surface/80 backdrop-blur-xl shadow-[0px_-10px_40px_rgba(0,0,0,0.05)] z-50">
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors hover:bg-surface-variant/50 rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors hover:bg-surface-variant/50 rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">apparel</span>
+<span class="font-label-md text-label-md">Try-On</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors hover:bg-surface-variant/50 rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-label-md text-label-md">AI Styles</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-md text-label-md">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant transition-colors hover:bg-surface-variant/50 rounded-xl px-4 py-1" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,7 @@
+.dart_tool/
+build/
+.git/
+android/.gradle/
+ios/Pods/
+assets/fonts/
+assets/animations/

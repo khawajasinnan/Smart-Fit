@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartFit - AI Stylist</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#ffd9e4",
+                        "on-primary-fixed-variant": "#5516be",
+                        "surface-container-highest": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#ded7e4",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "surface-container": "#f3ebf8",
+                        "secondary": "#b4136d",
+                        "on-error-container": "#93000a",
+                        "surface": "#fef7ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#fffbff",
+                        "background": "#fef7ff",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1d1a23",
+                        "on-surface-variant": "#494454",
+                        "surface-tint": "#6d3bd7",
+                        "outline-variant": "#cbc3d7",
+                        "primary-container": "#8455ef",
+                        "inverse-on-surface": "#f5eefb",
+                        "on-tertiary-fixed": "#2c1700",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#ede5f3",
+                        "inverse-surface": "#322f39",
+                        "secondary-container": "#fd56a7",
+                        "primary-fixed-dim": "#d0bcff",
+                        "primary-fixed": "#e9ddff",
+                        "primary": "#6b38d4",
+                        "outline": "#7b7486",
+                        "tertiary-container": "#a76500",
+                        "surface-variant": "#e7e0ed",
+                        "inverse-primary": "#d0bcff",
+                        "surface-bright": "#fef7ff",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#3e0022",
+                        "on-secondary-container": "#600037",
+                        "tertiary": "#855000",
+                        "tertiary-fixed": "#ffdcbb",
+                        "surface-container-low": "#f8f1fe",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#ffb0cd",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary-fixed-variant": "#8c0053",
+                        "on-surface": "#1d1a23"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-mobile": "24px",
+                        "container-padding": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Space Grotesk"],
+                        "quote-vibrant": ["Space Grotesk"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "quote-vibrant": ["28px", { "lineHeight": "1.1", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen relative overflow-x-hidden antialiased">
+<!-- Ambient Glow Backgrounds for Luminous Aesthetic -->
+<div class="fixed top-[-10%] right-[-10%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[80px] pointer-events-none z-0"></div>
+<div class="fixed bottom-[10%] left-[-10%] w-[400px] h-[400px] bg-secondary/5 rounded-full blur-[60px] pointer-events-none z-0"></div>
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-white/40 shadow-[0_20px_40px_rgba(139,92,246,0.05)] flex justify-between items-center px-margin-mobile py-4 transition-transform duration-200">
+<button class="text-primary hover:opacity-80 transition-opacity active:scale-95">
+<span class="material-symbols-outlined text-[28px]">menu</span>
+</button>
+<h1 class="font-display-lg text-headline-md tracking-tighter text-primary">SmartFit</h1>
+<button class="w-10 h-10 rounded-full overflow-hidden border-2 border-white/80 shadow-sm hover:opacity-80 transition-opacity active:scale-95">
+<img class="w-full h-full object-cover" data-alt="A bright, editorial portrait of a young woman with natural makeup, looking confident in soft, luminous studio lighting. The background is pure, airy white, enhancing the high-end, friendly aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAwSnnJXKCch7OGfgA4nWJYLeiHHo8tICif5c_TVR8sYFFHqezZBK2hE1fr8opeDejAPxkf8Rb9VdfRMNPr3E-yI-S23ApdAnUNuW9Q_dko3Q6POxoPAsRjDdODC5AYNYmsVzM9GAIgUO4MIWMdfbJJwdEdTomAYs4NcDXP9pAJ_uXc0UTeWyNbkm0HQ8vRP8vUfT7ZeYl07Gif2Bzgin3SfdYp3QMbKB3rjQPSbvDGgtRldeH-MVnO-mAYiQd74n7Uk8m7T5v1FsA"/>
+</button>
+</header>
+<!-- Main Chat Canvas -->
+<main class="relative z-10 pt-[100px] pb-[180px] px-margin-mobile flex flex-col gap-8 max-w-2xl mx-auto w-full">
+<!-- Animated Quote Block (AI Intro) -->
+<div class="bg-surface/60 backdrop-blur-2xl border border-white/50 rounded-[2rem] p-8 text-center shadow-[0_15px_35px_rgba(139,92,246,0.06)] mx-auto w-full max-w-[90%] mt-4">
+<h2 class="font-quote-vibrant text-quote-vibrant bg-clip-text text-transparent bg-gradient-to-br from-primary via-primary to-secondary">"Style is a conversation."</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-3 opacity-80">Let's craft your next iconic look.</p>
+</div>
+<!-- Chat Bubble: User -->
+<div class="self-end max-w-[85%] animate-fade-in-up">
+<div class="bg-surface-container-high text-on-surface px-6 py-4 rounded-[1.5rem] rounded-br-[0.5rem] shadow-sm inline-block border border-white/30">
+<p class="font-body-md text-body-md">I need something edgy but casual for a weekend trip to Berlin. Maybe a jacket?</p>
+</div>
+<p class="font-label-caps text-[10px] text-on-surface-variant/50 text-right mt-1.5 mr-2">10:42 AM</p>
+</div>
+<!-- Chat Bubble: AI with Featured Product -->
+<div class="self-start max-w-[95%] flex flex-col gap-4 w-full">
+<!-- Text Response -->
+<div class="bg-surface/80 backdrop-blur-xl border border-white/60 px-6 py-4 rounded-[1.5rem] rounded-bl-[0.5rem] shadow-[0_10px_30px_rgba(139,92,246,0.08)] inline-block max-w-[90%]">
+<p class="font-body-md text-body-md text-on-surface">Berlin calls for versatile layers. How about this modern take on the classic bomber? It offers structure while keeping that effortless, luminous aesthetic.</p>
+</div>
+<!-- Featured Product Glass Card -->
+<div class="bg-surface/70 backdrop-blur-2xl border border-white/60 rounded-[2rem] p-4 shadow-[0_20px_40px_rgba(139,92,246,0.12)] w-full ml-2 relative overflow-hidden group">
+<!-- Inner glow effect -->
+<div class="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none rounded-[2rem]"></div>
+<div class="relative rounded-[1.5rem] overflow-hidden mb-5 aspect-[4/5] bg-surface-container-lowest shadow-inner">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" data-alt="A highly detailed, realistic photograph of a premium olive green bomber jacket worn by an invisible mannequin. The lighting is bright, soft, and luminous, perfectly capturing the subtle sheen of the luxurious nylon fabric against a pure white background. The jacket looks structured yet inviting, embodying an edgy, high-fashion aesthetic with a glowing, airy ambiance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYqglOiRipzrmeDAVBJ4GkfYVUeqF_eAZDvySNBWq6UaUFTyFmDK7TgFQ07MsZLCwO8ZbP-fr-Jz5aLxDLsAJROo1Q3F6F44QzYGIn7pM5BVwyoHlf1l_8bU6UmtusRXv1S0xTAm69QBdBfqLNnWbLqXueGCqA4SIa4bbGx8xoEY06gHbnbUgb2YMSFjS3OpDcVkhTsUV0Y_dHSR2w1G_ulmJ6rCJHWOT-9qWvtUYRXov26qJECbrq5U0FMnRq1H6txX9BmlmF4QU"/>
+<div class="absolute top-4 right-4 bg-surface/80 backdrop-blur-md px-4 py-1.5 rounded-full text-primary font-label-caps text-[10px] border border-white/60 shadow-[0_4px_12px_rgba(0,0,0,0.05)] tracking-widest flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+                        94% MATCH
+                    </div>
+</div>
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-5 px-2 pb-1 relative z-10">
+<div>
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1.5">Nylon Flight Jacket</h3>
+<p class="font-label-caps text-label-caps text-on-surface-variant opacity-70 tracking-widest uppercase">$240 · Olive Drab</p>
+</div>
+<button class="w-full sm:w-auto bg-primary text-on-primary px-8 py-3.5 rounded-full font-label-caps text-label-caps shadow-[0_0_20px_rgba(107,56,212,0.4)] hover:bg-surface-tint hover:shadow-[0_0_25px_rgba(107,56,212,0.6)] transition-all active:scale-95 flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">checkroom</span>
+                        TRY ON
+                    </button>
+</div>
+</div>
+<p class="font-label-caps text-[10px] text-on-surface-variant/50 ml-4 mt-1">10:42 AM</p>
+</div>
+</main>
+<!-- Chat Input Fixed Bar -->
+<div class="fixed bottom-[96px] w-full px-margin-mobile left-1/2 -translate-x-1/2 z-40 max-w-2xl">
+<div class="bg-surface/80 backdrop-blur-2xl border border-white/60 rounded-full p-2 flex items-center gap-2 shadow-[0_-10px_30px_rgba(139,92,246,0.08)] focus-within:ring-2 focus-within:ring-primary/40 focus-within:bg-surface transition-all duration-300">
+<button class="w-12 h-12 shrink-0 rounded-full flex items-center justify-center text-primary bg-primary/10 hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">add_photo_alternate</span>
+</button>
+<input class="flex-1 bg-transparent border-none focus:ring-0 font-body-md text-body-md text-on-surface placeholder-on-surface-variant/60 px-3 outline-none" placeholder="Describe a vibe or upload a photo..." type="text"/>
+<button class="w-12 h-12 shrink-0 rounded-full flex items-center justify-center text-on-primary bg-primary shadow-[0_0_15px_rgba(107,56,212,0.4)] hover:bg-surface-tint transition-colors active:scale-90">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">arrow_upward</span>
+</button>
+</div>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-8 z-50 rounded-t-lg bg-surface/80 backdrop-blur-2xl border-t border-white/40 shadow-[0_-10px_30px_rgba(139,92,246,0.1)]">
+<!-- Home (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors group w-16">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">home</span>
+<span class="font-label-caps text-[10px] opacity-80">Home</span>
+</button>
+<!-- Try-On (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors group w-16">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">checkroom</span>
+<span class="font-label-caps text-[10px] opacity-80">Try-On</span>
+</button>
+<!-- AI Styles (Active) -->
+<button class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-full px-4 py-2 shadow-[0_0_15px_rgba(132,85,239,0.3)] scale-110 duration-300 ease-out min-w-[72px]">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-caps text-[10px] font-bold">AI Styles</span>
+</button>
+<!-- Vault (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors group w-16">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">Guitar</span>
+<span class="font-label-caps text-[10px] opacity-80">Vault</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors group w-16">
+<span class="material-symbols-outlined mb-1 group-hover:scale-110 transition-transform">person</span>
+<span class="font-label-caps text-[10px] opacity-80">Profile</span>
+</button>
+</nav>
+</body></html>

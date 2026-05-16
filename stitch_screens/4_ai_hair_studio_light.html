@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#494454",
+                        "surface-tint": "#6d3bd7",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "background": "#fef7ff",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary": "#6b38d4",
+                        "surface": "#fef7ff",
+                        "primary-fixed": "#e9ddff",
+                        "tertiary-container": "#a76500",
+                        "primary-container": "#8455ef",
+                        "on-tertiary-fixed": "#2c1700",
+                        "inverse-on-surface": "#f5eefb",
+                        "on-secondary-container": "#76014e",
+                        "outline": "#7b7486",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e7e0ed",
+                        "surface-container-low": "#f8f1fe",
+                        "on-surface": "#1d1a23",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "inverse-primary": "#d0bcff",
+                        "surface-bright": "#fef7ff",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-container": "#f3ebf8",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#3d0026",
+                        "on-background": "#1d1a23",
+                        "inverse-surface": "#322f39",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cbc3d7",
+                        "on-secondary-fixed-variant": "#85145a",
+                        "secondary-fixed-dim": "#ffafd3",
+                        "secondary": "#a43073",
+                        "surface-container-high": "#ede5f3",
+                        "surface-container-highest": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "tertiary": "#855000",
+                        "secondary-container": "#fc79bd",
+                        "surface-dim": "#ded7e4",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffd8e7",
+                        "tertiary-fixed": "#ffdcbb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "unit": "8px",
+                        "container-margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "container-margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Space Grotesk"],
+                        "body-md": ["Space Grotesk"],
+                        "headline-md": ["Space Grotesk"],
+                        "label-md": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "display-lg": ["Space Grotesk"],
+                        "body-lg": ["Space Grotesk"],
+                        "button-label": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "button-label": ["16px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen pb-32">
+<!-- Top Navigation Shell -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_40px_40px_rgba(0,0,0,0.05)] flex items-center justify-between px-container-margin-mobile h-16">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-primary">SmartFit</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="active:scale-95 transition-transform text-primary">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-16">
+<!-- Hero Section: Realistic Face Photo -->
+<section class="relative h-[442px] w-full overflow-hidden">
+<img alt="Portrait" class="w-full h-full object-cover" data-alt="A high-resolution, close-up portrait of a stylish young man with clear skin and a focused expression, set against a soft, clinical lavender studio background. The lighting is bright and airy, reflecting a premium editorial aesthetic with soft highlights on the facial contours. The image captures a clean, modern look consistent with a luxury fashion app, using a luminous color palette and sharp details." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1NWQm_lZ1K8JeJwv0Uq2P7rZxE76fTGOnkdNJO1hSNlhUeqJFq5YQP-wmsaF8aKoGMbkDXjn5JVFhyie5yGw26J3LsmO_W-dG90vJOsCyum-cXXi5hW3cOZjWwQJ6j11IN68n5NYXQltiKbXLXmREwwlSY-SWqewWC9eNBdFhwY-ZZ-ftWzPANnDek0gd9JRfEZl-cvxini5E9T5BZwf_DHyL4_itEiA8HABg_zdxNBVxu8bI3em96698FaI439CM9CQq7GaiMIk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+<!-- Animated Style Quote Overlay -->
+<div class="absolute bottom-10 left-container-margin-mobile right-container-margin-mobile">
+<div class="inline-block px-6 py-3 bg-surface/90 backdrop-blur-md rounded-lg shadow-lg border border-white/20">
+<p class="font-display-lg text-display-lg text-primary leading-tight">Look your best.</p>
+</div>
+</div>
+</section>
+<!-- Style Selection Grid -->
+<section class="px-container-margin-mobile mt-stack-lg">
+<div class="flex items-center justify-between mb-stack-md">
+<h2 class="font-headline-md text-headline-md text-on-surface">Pick your style</h2>
+<span class="text-secondary font-label-md text-label-md">View all</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-stack-md">
+<!-- Fade Style Card -->
+<button class="group relative bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.05)] border-2 border-transparent hover:border-primary transition-all text-left">
+<div class="aspect-[4/5] relative">
+<img alt="Fade Style" class="w-full h-full object-cover" data-alt="A high-fidelity editorial shot of a male model showcasing a precision skin fade haircut. The setting is a minimalist, light-filled studio with soft pastel tones that enhance the sharp lines of the hairstyle. The visual style is clean and sophisticated, aligning with Gen-Z fashion trends through airy lighting and a high-end photographic finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdR1x5xWYFOu42WvqUCwhhUb8VIBIeIsRuvV0okrQuKFPX509JD93JPBRdA4lIn0hhfirkCiB68-FAarwvezV_7cwU8ZhtWgKFk-v5EzKg4Q-4nlZbgf_HpJpf33YOzdW9-4SrVM9mn3dMc0LK9r0fdu8__4VXXUcLo_M4bHI7QV1_m8Nkaz4w890rZoGzYF1FFqMBtxzi1DaFhwNzaD618U12hfAa_4Ii98ySJgaRbqGwcjttdUuEkMqoAt_wbMzdg-ekl2J0kds"/>
+<div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="p-4 flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-on-surface">Fade</span>
+<span class="material-symbols-outlined text-primary" data-weight="fill">check_circle</span>
+</div>
+</button>
+<!-- Buzz Style Card -->
+<button class="group relative bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.05)] border-2 border-transparent hover:border-primary transition-all text-left">
+<div class="aspect-[4/5] relative">
+<img alt="Buzz Style" class="w-full h-full object-cover" data-alt="A professional close-up photograph of a clean buzz cut hairstyle on a model with a sharp jawline. The background is a soft lavender gradient, creating a serene and premium digital editorial look. The lighting is diffused and even, emphasizing the texture of the hair and the clarity of the skin, maintaining a consistent luminous aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAP9yjk37y9LIMNlPYB_DEnESz_xhd5q5fvjMK_u9rOco4jwv86h0tnEvyDzkWZ6B3xtKy4TJzKFj464k8c_q1TWU2ZxAWdIi_L9-T1F2ctoLVyOx-cWQoyN-Ayhwde5fJydQWlMMbWqyGLHiKNVdS8weSgr_sEjUC8ohBNaZDuNMXMD6TEtz3r2H5qXYR4jzFdqjkrgctMObbBWC8vMEGv7NpRuxtLFR-JXRl_YF4UNkMxLZ5wKv5bMgJMGVLWokssHbPegxfMXGQ"/>
+<div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="p-4">
+<span class="font-headline-md text-headline-md text-on-surface">Buzz</span>
+</div>
+</button>
+<!-- Clean Style Card -->
+<button class="group relative bg-surface-container-lowest rounded-lg overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.05)] border-2 border-transparent hover:border-primary transition-all text-left">
+<div class="aspect-[4/5] relative">
+<img alt="Clean Style" class="w-full h-full object-cover" data-alt="A bright and optimistic portrait of a young person with a classic, clean-cut hairstyle. The model is posed against a minimalist, white-washed architectural background that feels airy and breathable. The composition uses a sophisticated palette of soft whites and cool slate tones, capturing an effortless cool and polished appearance for a modern hair studio interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAFYHdM7zNFpK8S2tRV21cNrKvJvliCFs8tSA95nci4nmUvF2n-68RuNkLWB5xDJ-VCsrgwno14_xyuZsU45iU4tdzHVrp79QFO2YMKjJX0OGb31CPPOdRvY-MAmUwYP1VqE-mbsBdVkZWuHTrTqigGBxRszLFHJPb6055hNNtnxp_36q_SFO6XefxFu2f9eEh46E_Y8dC851YkggWwbEEfVN-VGqWG8GAbWhs_phNxBgxzZyYuuGfUKS_2np9fYzCHKi4c8Tl0A1E"/>
+<div class="absolute inset-0 bg-black/5 group-hover:bg-transparent transition-colors"></div>
+</div>
+<div class="p-4">
+<span class="font-headline-md text-headline-md text-on-surface">Clean</span>
+</div>
+</button>
+</div>
+</section>
+<!-- Call to Action Section -->
+<section class="px-container-margin-mobile mt-stack-lg mb-stack-lg">
+<div class="bg-primary-container/10 p-6 rounded-lg flex flex-col gap-4 border border-primary/10">
+<p class="font-body-lg text-body-lg text-on-surface text-center">Ready to see how it looks?</p>
+<button class="w-full bg-[#F472B6] text-white font-button-label text-button-label py-4 rounded-lg shadow-lg active:scale-[0.98] transition-transform">
+                    Apply
+                </button>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-2 py-3 pb-safe bg-surface/80 backdrop-blur-xl z-50 shadow-[0px_-10px_40px_rgba(0,0,0,0.05)]">
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 px-4 py-1">
+<span class="material-symbols-outlined">home</span>
+<span class="font-label-md text-label-md">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 px-4 py-1">
+<span class="material-symbols-outlined">apparel</span>
+<span class="font-label-md text-label-md">Try-On</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-xl px-4 py-1 active:scale-90 transition-transform">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-md text-label-md">AI Styles</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 px-4 py-1">
+<span class="material-symbols-outlined">favorite</span>
+<span class="font-label-md text-label-md">Saved</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-variant/50 transition-colors active:scale-90 px-4 py-1">
+<span class="material-symbols-outlined">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</button>
+</nav>
+</body></html>

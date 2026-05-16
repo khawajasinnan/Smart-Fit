@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-tertiary": "#ffffff",
+                      "on-surface-variant": "#494454",
+                      "surface-tint": "#6d3bd7",
+                      "error-container": "#ffdad6",
+                      "on-secondary": "#ffffff",
+                      "background": "#fef7ff",
+                      "on-tertiary-container": "#fffbff",
+                      "surface-container-lowest": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "primary": "#6b38d4",
+                      "surface": "#fef7ff",
+                      "primary-fixed": "#e9ddff",
+                      "tertiary-container": "#a76500",
+                      "primary-container": "#8455ef",
+                      "on-tertiary-fixed": "#2c1700",
+                      "inverse-on-surface": "#f5eefb",
+                      "on-secondary-container": "#76014e",
+                      "outline": "#7b7486",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#e7e0ed",
+                      "surface-container-low": "#f8f1fe",
+                      "on-surface": "#1d1a23",
+                      "on-tertiary-fixed-variant": "#673d00",
+                      "inverse-primary": "#d0bcff",
+                      "surface-bright": "#fef7ff",
+                      "primary-fixed-dim": "#d0bcff",
+                      "surface-container": "#f3ebf8",
+                      "on-primary-container": "#fffbff",
+                      "on-secondary-fixed": "#3d0026",
+                      "on-background": "#1d1a23",
+                      "inverse-surface": "#322f39",
+                      "on-error": "#ffffff",
+                      "outline-variant": "#cbc3d7",
+                      "on-secondary-fixed-variant": "#85145a",
+                      "secondary-fixed-dim": "#ffafd3",
+                      "secondary": "#a43073",
+                      "surface-container-high": "#ede5f3",
+                      "surface-container-highest": "#e7e0ed",
+                      "on-primary-fixed": "#23005c",
+                      "on-primary-fixed-variant": "#5516be",
+                      "tertiary-fixed-dim": "#ffb869",
+                      "tertiary": "#855000",
+                      "secondary-container": "#fc79bd",
+                      "surface-dim": "#ded7e4",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#ffd8e7",
+                      "tertiary-fixed": "#ffdcbb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "1rem",
+                      "lg": "2rem",
+                      "xl": "3rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "gutter": "16px",
+                      "stack-md": "16px",
+                      "stack-sm": "8px",
+                      "unit": "8px",
+                      "container-margin-mobile": "20px",
+                      "stack-lg": "32px",
+                      "container-margin-desktop": "40px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": ["Space Grotesk"],
+                      "body-md": ["Space Grotesk"],
+                      "headline-md": ["Space Grotesk"],
+                      "label-md": ["Space Grotesk"],
+                      "headline-lg": ["Space Grotesk"],
+                      "display-lg": ["Space Grotesk"],
+                      "body-lg": ["Space Grotesk"],
+                      "button-label": ["Space Grotesk"]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                      "display-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "button-label": ["16px", {"lineHeight": "20px", "fontWeight": "500"}]
+              }
+            },
+          },
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background antialiased overflow-hidden">
+<!-- Top App Bar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 flex items-center justify-between px-container-margin-mobile h-16 shadow-[0px_40px_40px_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform hover:opacity-80">
+<span class="material-symbols-outlined text-primary text-headline-md" data-icon="close">close</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-primary">SmartFit</h1>
+</div>
+<button class="active:scale-95 transition-transform hover:opacity-80">
+<span class="material-symbols-outlined text-primary text-headline-md" data-icon="settings">settings</span>
+</button>
+</header>
+<!-- Main Camera Canvas -->
+<main class="relative h-screen w-full flex flex-col items-center justify-center pt-16">
+<!-- Background Camera View (Placeholder Image) -->
+<div class="absolute inset-0 z-0 bg-surface-dim">
+<img alt="Closet view" class="w-full h-full object-cover grayscale-[0.2]" data-alt="A high-resolution, bright, and clinical studio shot of a minimalist closet area. A stylish black jacket hangs neatly on a light wood hanger against a pristine white wall. The lighting is soft and airy, typical of a high-end fashion editorial, creating a clean light-mode aesthetic with subtle shadows and a luminous atmosphere. The composition is centered to facilitate a mobile scanning interface overlay." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAgw8opGKHWdhrTbdz_StvY6wspw6DgbHkg5eE6uc3m_rvTTyXccyVgN6PyiIprFLW-2CSmsQYJshfr1gP0zAM_kkmRKA1KDl77o8oJ_QirfAdJ0g_tCt85vL0htn_k6Zm4ugDyXPFajeMZ4Hcs_4fE4qD7gV8Q1p1EcUe1nmeSt6ejTZR5gH3eZ1IK0_jLYqL25Lq5aPjLkpGSrjxKpqdgy8rZ3iuU7-OYp2Xx5ZNDFcjBUSwkNWCfO8f_TKXSnKi05FZtAAvYDrc"/>
+</div>
+<!-- Scanning Overlay Frame -->
+<div class="relative z-10 w-[80vw] max-w-[400px] aspect-[3/4] border-2 border-primary/40 rounded-lg flex items-center justify-center">
+<!-- Corner Brackets -->
+<div class="absolute -top-1 -left-1 w-8 h-8 border-t-4 border-l-4 border-primary rounded-tl-lg"></div>
+<div class="absolute -top-1 -right-1 w-8 h-8 border-t-4 border-r-4 border-primary rounded-tr-lg"></div>
+<div class="absolute -bottom-1 -left-1 w-8 h-8 border-b-4 border-l-4 border-primary rounded-bl-lg"></div>
+<div class="absolute -bottom-1 -right-1 w-8 h-8 border-b-4 border-r-4 border-primary rounded-br-lg"></div>
+<!-- Scanning Line -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-60 shadow-[0_0_15px_rgba(107,56,212,0.8)]"></div>
+<!-- Pulsing Identifier -->
+<div class="w-24 h-24 rounded-full border border-primary/20 bg-primary/5 animate-pulse flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-display-lg" data-icon="center_focus_weak">center_focus_weak</span>
+</div>
+</div>
+<!-- Instructions -->
+<div class="relative z-10 mt-stack-lg glass-panel bg-white/60 px-6 py-3 rounded-full shadow-sm">
+<p class="font-label-md text-label-md text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="info">info</span>
+                Position the item within the frame
+            </p>
+</div>
+</main>
+<!-- Found It! Popup -->
+<div class="fixed bottom-0 left-0 w-full z-50 p-container-margin-mobile pb-8">
+<div class="w-full max-w-[600px] mx-auto glass-panel bg-white/90 rounded-lg p-6 shadow-[0px_-10px_40px_rgba(0,0,0,0.05)] border border-surface-variant/50">
+<div class="flex items-center gap-4 mb-stack-lg">
+<div class="w-20 h-20 rounded-lg overflow-hidden bg-surface-container-low shadow-sm">
+<img alt="Black Jacket" class="w-full h-full object-cover" data-alt="A detailed, close-up photograph of a premium black leather jacket, highlighting the smooth texture and silver metallic hardware. The product is presented against a soft, lavender-tinted light background that complements the brand's luminous editorial style. The lighting is bright and crisp, showcasing the high-quality stitching and modern silhouette of the jacket in a way that feels optimistic and high-end." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbwbjIqHJ0eQ4QNcsjECW5MdZfYUfKuoqM2WKLKTP4bP16V3vOfX29ycV3VA64LB2DvChJ3FOLGh4BVJ252trqQPgm1mVmpM0R_QQNYS3uiVfrVvwwTM-N_8dJM1AEZlNXKT6NKR9Cb_mO8FFeJH8KhnUPjM8SjThigCsO3SI9yrXuF6RzF2xUBtrCVDExbQlN2jkhMFOyE3vYABhwxxMk91NMTAlYSMQyMbxJ-tVfOHaCq5zEAJPCHW7yt2KOCZJioJRaooM5Yg4"/>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="bg-secondary-container/20 text-on-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Perfect Match</span>
+<h2 class="font-headline-md text-headline-md text-primary">Found It!</h2>
+</div>
+<p class="font-body-lg text-body-lg text-on-surface">Black Jacket</p>
+<p class="font-label-md text-label-md text-on-surface-variant opacity-70">Streetwear Essentials • $89.00</p>
+</div>
+<button class="active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-secondary text-headline-md" data-icon="favorite">favorite</span>
+</button>
+</div>
+<div class="flex flex-col sm:flex-row gap-stack-sm">
+<button class="flex-1 bg-primary text-white font-button-label text-button-label h-12 rounded-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="shopping_bag">shopping_bag</span>
+                    Add to Bag
+                </button>
+<button class="flex-1 bg-surface-variant/50 text-primary border border-outline-variant font-button-label text-button-label h-12 rounded-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+                    AI Styles
+                </button>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation (Implicit context: In-Task, so restricted as per Shell Visibility Rule) -->
+<!-- Navigation is suppressed because the page intent is Task-Focused (Scanner) with a primary "Close" action. -->
+</body></html>

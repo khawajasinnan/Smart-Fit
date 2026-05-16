@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartFit Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-tint": "#6d3bd7",
+                        "on-primary-fixed-variant": "#5516be",
+                        "on-secondary-fixed-variant": "#8c0053",
+                        "background": "#fef7ff",
+                        "surface-container-low": "#f8f1fe",
+                        "inverse-surface": "#322f39",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-fixed": "#23005c",
+                        "primary": "#6b38d4",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed": "#2c1700",
+                        "secondary-container": "#fd56a7",
+                        "inverse-on-surface": "#f5eefb",
+                        "surface-dim": "#ded7e4",
+                        "on-primary-container": "#fffbff",
+                        "tertiary-fixed": "#ffdcbb",
+                        "surface-container": "#f3ebf8",
+                        "tertiary": "#855000",
+                        "primary-fixed": "#e9ddff",
+                        "on-error-container": "#93000a",
+                        "error": "#ba1a1a",
+                        "surface-container-highest": "#e7e0ed",
+                        "surface-variant": "#e7e0ed",
+                        "surface-bright": "#fef7ff",
+                        "secondary-fixed-dim": "#ffb0cd",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed": "#ffd9e4",
+                        "on-secondary-fixed": "#3e0022",
+                        "outline": "#7b7486",
+                        "on-background": "#1d1a23",
+                        "on-secondary-container": "#600037",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "primary-fixed-dim": "#d0bcff",
+                        "outline-variant": "#cbc3d7",
+                        "primary-container": "#8455ef",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "on-surface": "#1d1a23",
+                        "surface-container-high": "#ede5f3",
+                        "on-tertiary": "#ffffff",
+                        "inverse-primary": "#d0bcff",
+                        "error-container": "#ffdad6",
+                        "secondary": "#b4136d",
+                        "on-tertiary-container": "#fffbff",
+                        "on-surface-variant": "#494454",
+                        "on-error": "#ffffff",
+                        "surface": "#fef7ff",
+                        "tertiary-container": "#a76500"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "unit": "8px",
+                        "margin-mobile": "24px"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Inter"],
+                        "headline-lg": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "quote-vibrant": ["Space Grotesk"],
+                        "headline-md": ["Space Grotesk"],
+                        "display-lg": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "quote-vibrant": ["28px", { "lineHeight": "1.1", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .bg-gradient-vibe {
+            background: linear-gradient(135deg, #e9ddff 0%, #fef7ff 50%, #ffd9e4 100%);
+        }
+        .btn-gradient {
+            background: linear-gradient(90deg, #8455ef 0%, #fd56a7 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-gradient-vibe">
+<!-- Ambient Glow Effects -->
+<div class="absolute top-[-10%] left-[-10%] w-96 h-96 bg-primary-fixed-dim rounded-full mix-blend-multiply filter blur-3xl opacity-50 z-0"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-secondary-fixed-dim rounded-full mix-blend-multiply filter blur-3xl opacity-50 z-0"></div>
+<!-- Main Container -->
+<main class="w-full max-w-md px-margin-mobile py-8 z-10 flex flex-col justify-center h-full">
+<!-- Hero Image (Glassmorphism Card) -->
+<div class="relative w-full h-64 rounded-xl overflow-hidden shadow-[0_20px_40px_rgba(139,92,246,0.15)] mb-8 glass-panel flex-shrink-0">
+<img alt="Fashionable young woman" class="w-full h-full object-cover" data-alt="A high-quality editorial photograph of a fashionable Gen-Z woman looking confidently at the camera. The lighting is soft and luminous, highlighting her features and trendy outfit. The background is slightly out of focus, featuring soft pastel tones of lavender and pink that seamlessly blend with the app's overall 'Luminous Vibe' aesthetic. The mood is approachable, energetic, and premium, evoking a sense of digital-native style and modern elegance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBa1wth9wDHCwhkOpTD_Rol8i2mW83RuLicXarsFGRaNaNl6zjo1NVJKL0vGhFrRJIRBo0UgpxHus091xX5cnFCrLYHfCZnI94wYaZdzGfW_3jczcJyWmnFVMDobqrqhx-Wl-v_i85QRcQQgEfVt6mv2NRsxpvkIJT4JhpatgprfRmpY8vbktDEsgU5sswHDc0GEBQ1l6Gk3_HoZ7mV8aHSlrIRebIZ8Nk6b09jKh90jtMwAT6GvcmhthEWGmJmvhCTb_G--93I_VM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Welcome Back</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Login to find your fit.</p>
+</div>
+</div>
+<!-- Login Form -->
+<div class="glass-panel rounded-xl p-6 shadow-[0_20px_40px_rgba(139,92,246,0.1)] flex-grow flex flex-col justify-center">
+<form class="flex flex-col gap-6">
+<!-- Email Input -->
+<div class="flex flex-col gap-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase ml-2" for="email">Email</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-outline" data-icon="mail">mail</span>
+<input class="w-full bg-surface-container-low border-none rounded-[24px] py-4 pl-12 pr-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:outline-none transition-shadow shadow-inner placeholder:text-outline-variant" id="email" placeholder="hello@example.com" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="flex flex-col gap-2">
+<div class="flex justify-between items-center ml-2 mr-2">
+<label class="font-label-caps text-label-caps text-on-surface-variant uppercase" for="password">Password</label>
+<a class="font-body-md text-body-md text-primary font-medium hover:text-secondary transition-colors text-sm" href="#">Forgot?</a>
+</div>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 transform -translate-y-1/2 text-outline" data-icon="lock">lock</span>
+<input class="w-full bg-surface-container-low border-none rounded-[24px] py-4 pl-12 pr-4 font-body-md text-body-md text-on-surface focus:ring-2 focus:ring-primary focus:outline-none transition-shadow shadow-inner placeholder:text-outline-variant" id="password" placeholder="••••••••" type="password"/>
+</div>
+</div>
+<!-- Primary Button -->
+<button class="w-full btn-gradient text-on-primary font-body-lg text-body-lg font-bold py-4 rounded-full mt-4 shadow-[0_10px_20px_rgba(132,85,239,0.3)] hover:opacity-90 transition-opacity flex items-center justify-center gap-2 group" type="submit">
+                    Log In
+                    <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+<!-- Social Auth Divider -->
+<div class="relative flex py-6 items-center">
+<div class="flex-grow border-t border-outline-variant/50"></div>
+<span class="flex-shrink-0 mx-4 font-body-md text-body-md text-on-surface-variant text-sm">Or continue with</span>
+<div class="flex-grow border-t border-outline-variant/50"></div>
+</div>
+<!-- Social Buttons -->
+<div class="flex gap-4">
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-full py-3 flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors shadow-sm">
+<img alt="Google Logo" class="w-5 h-5" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDvms__RMbaU0B-GOUsQ-HV8s9ya7fbfdj4UMjL9BbXUQTV0W3zFr7ETaroBXfwRHeecx1AmfnYka9tuZ9MZvfKu8gUTKZ8JmUwTZM3Tf1691hO60Ib7mScEVGssUmwB5AiI_ggf0_8vmiLq2zMI47GY6G1uzksCmYNIe4YpwZPa1oMEC8X4TfU2yI1l-KtwMQ4GFXffBAxswTqqJLla7zD3tMhqIvZ1xiQ9Ght49N8AWaHTTCE44lTbKNjS02T2np_LYU6QKFFsQ"/>
+<span class="font-body-md text-body-md font-medium text-on-surface">Google</span>
+</button>
+<button class="flex-1 bg-surface-container-lowest border border-outline-variant/30 rounded-full py-3 flex items-center justify-center gap-2 hover:bg-surface-container-low transition-colors shadow-sm">
+<span class="material-symbols-outlined text-on-surface text-[20px]" data-icon="apple">ios</span>
+<span class="font-body-md text-body-md font-medium text-on-surface">Apple</span>
+</button>
+</div>
+<!-- Footer -->
+<div class="mt-8 text-center">
+<p class="font-body-md text-body-md text-on-surface-variant">
+                    New here? <a class="text-primary font-bold hover:text-secondary transition-colors" href="#">Join</a>
+</p>
+</div>
+</div>
+</main>
+</body></html>

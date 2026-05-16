@@ -1,0 +1,218 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>SmartFit - Home</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed": "#ffd9e4",
+                        "on-primary-fixed-variant": "#5516be",
+                        "surface-container-highest": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-error": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "surface-dim": "#ded7e4",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "surface-container": "#f3ebf8",
+                        "secondary": "#b4136d",
+                        "on-error-container": "#93000a",
+                        "surface": "#fef7ff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#fffbff",
+                        "background": "#fef7ff",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#1d1a23",
+                        "on-surface-variant": "#494454",
+                        "surface-tint": "#6d3bd7",
+                        "outline-variant": "#cbc3d7",
+                        "primary-container": "#8455ef",
+                        "inverse-on-surface": "#f5eefb",
+                        "on-tertiary-fixed": "#2c1700",
+                        "error": "#ba1a1a",
+                        "surface-container-high": "#ede5f3",
+                        "inverse-surface": "#322f39",
+                        "secondary-container": "#fd56a7",
+                        "primary-fixed-dim": "#d0bcff",
+                        "primary-fixed": "#e9ddff",
+                        "primary": "#6b38d4",
+                        "outline": "#7b7486",
+                        "tertiary-container": "#a76500",
+                        "surface-variant": "#e7e0ed",
+                        "inverse-primary": "#d0bcff",
+                        "surface-bright": "#fef7ff",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#3e0022",
+                        "on-secondary-container": "#600037",
+                        "tertiary": "#855000",
+                        "tertiary-fixed": "#ffdcbb",
+                        "surface-container-low": "#f8f1fe",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-fixed-dim": "#ffb0cd",
+                        "on-tertiary-container": "#fffbff",
+                        "on-secondary-fixed-variant": "#8c0053",
+                        "on-surface": "#1d1a23"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "margin-mobile": "24px",
+                        "container-padding": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Space Grotesk"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Space Grotesk"],
+                        "quote-vibrant": ["Space Grotesk"],
+                        "label-caps": ["Inter"],
+                        "headline-md": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                        "quote-vibrant": ["28px", {"lineHeight": "1.1", "fontWeight": "700"}],
+                        "label-caps": ["12px", {"lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background: linear-gradient(135deg, #fef7ff 0%, #f5eefb 50%, #ffd9e4 100%);
+            background-attachment: fixed;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  <style data-stitch-cursor=""></style><style data-stitch-scroll-lock=""></style></head>
+<body class="bg-background text-on-background min-h-screen pb-32 pt-24 antialiased font-body-md text-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-white/40 shadow-[0_20px_40px_rgba(139,92,246,0.05)]">
+<div class="flex justify-between items-center px-margin-mobile py-4 w-full">
+<button class="text-on-surface-variant hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-display-lg text-headline-md tracking-tighter text-primary">SmartFit</h1>
+<div class="w-10 h-10 rounded-full overflow-hidden border border-white/40 shadow-sm">
+<img alt="User avatar profile" class="w-full h-full object-cover" data-alt="A high-fashion editorial close-up portrait of a young Gen-Z woman with a soft, glowing complexion. She has natural, effortlessly styled hair and minimal but radiant makeup. The lighting is soft and ethereal, set against a pristine, bright studio background, embodying a premium, approachable, and luminous aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuADYpute040g46indjBOYX5ej08x-hgN43lBlXOQO2F2o92EbT_u5P43kxoy0aS7lPWWMjO4FRJ31evaif8g4s1VC0A-J8NGKP109Ti1VymRanpVxC7_2t6ZVUiui2EfHvPSQxdBdiMHvjHxlKgG3dYlcASOPicUZQBDAcz74e5UTfuVmQi97agdE1HrVqvkL-N7SM2xTntDs0SWdhzuecbSq1KUxeUXUWojJz2-wMF2_eFMgqzX6PgnYXIfhJFTOqJxXzPAom-EUA">
+</div>
+</div>
+</header>
+<main class="px-margin-mobile max-w-7xl mx-auto space-y-16">
+<!-- Welcome Section -->
+<section class="mt-8">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Hi Alex!</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Ready to elevate your style today?</p>
+</section>
+<!-- Quick Actions Bento Grid -->
+<section class="grid grid-cols-2 md:grid-cols-3 gap-gutter">
+<!-- Scan -->
+<button class="col-span-1 aspect-square bg-surface/70 backdrop-blur-2xl rounded-lg border border-white/40 shadow-[0_20px_40px_rgba(139,92,246,0.1)] flex flex-col items-center justify-center gap-4 hover:scale-95 transition-transform group">
+<div class="w-16 h-16 rounded-full bg-primary-container/20 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-on-primary transition-colors shadow-[0_0_15px_rgba(132,85,239,0.3)]">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+</div>
+<span class="font-headline-md text-body-lg text-on-surface">Scan</span>
+</button>
+<!-- Try On -->
+<button class="col-span-1 aspect-square bg-primary text-on-primary rounded-lg shadow-[0_20px_40px_rgba(139,92,246,0.25)] flex flex-col items-center justify-center gap-4 hover:scale-95 transition-transform relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-tr from-transparent to-white/20"></div>
+<div class="w-16 h-16 rounded-full bg-white/20 flex items-center justify-center backdrop-blur-sm z-10">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">checkroom</span>
+</div>
+<span class="font-headline-md text-body-lg z-10">Try On</span>
+</button>
+<!-- Hair -->
+<button class="col-span-2 md:col-span-1 aspect-[2/1] md:aspect-square bg-secondary-container/20 backdrop-blur-2xl rounded-lg border border-white/40 shadow-[0_20px_40px_rgba(253,86,167,0.1)] flex flex-row md:flex-col items-center justify-center gap-4 hover:scale-95 transition-transform group">
+<div class="w-16 h-16 rounded-full bg-secondary-container/30 flex items-center justify-center text-secondary group-hover:bg-secondary group-hover:text-on-secondary transition-colors">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">face_retouching_natural</span>
+</div>
+<span class="font-headline-md text-body-lg text-on-surface">Hair</span>
+</button>
+</section>
+<!-- Quote -->
+<section class="bg-surface/70 backdrop-blur-2xl rounded-xl border border-white/40 shadow-[0_20px_40px_rgba(139,92,246,0.1)] p-8 text-center relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary-fixed-dim/30 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
+<p class="font-quote-vibrant text-quote-vibrant text-primary relative z-10">"Stay fresh, stay you."</p>
+</section>
+<!-- Trending -->
+<section class="space-y-6">
+<div class="flex justify-between items-end">
+<h3 class="font-headline-md text-headline-md text-on-surface">Trending Now</h3>
+<button class="text-primary font-body-md text-label-caps uppercase tracking-widest hover:opacity-80">See All</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Card 1 -->
+<div class="bg-surface/70 backdrop-blur-2xl rounded-xl border border-white/40 shadow-[0_20px_40px_rgba(139,92,246,0.1)] overflow-hidden group">
+<div class="aspect-[4/5] relative overflow-hidden">
+<img alt="Fashion model in trendy outfit" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A full-body high-fashion editorial shot of a stylish Gen-Z model posing confidently outdoors. They are wearing a bright, avant-garde layered outfit that pops against a soft, luminous city background. The lighting is sunny and diffused, creating a bright, optimistic, and airy aesthetic typical of modern streetwear campaigns." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbtq-Vk8h_ziaLU3ys_Im580CO0fM-z8tKNrWccffgPgkZTFNmA3EmZvrqrzYIEkv7jaFlT1DhQKDHORX_ihgQgAw77G1fJY9ffhIpZczR0eumotF_N3DL1W78dO5RgD-1pmRL25URlhj_aiJTfanby-IQtejIkmXS0R-2xj9xDI_ousSTAp2GNHfeEbuEo5VTpnnaPG1t5r1THOyX6FIi8aGbV62EorgGbAWH8pGaAnL1E_u5PQQvlvNB_wN_6HblByk6_2un308">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="inline-block px-3 py-1 bg-surface-container/80 backdrop-blur-md rounded-full font-label-caps text-label-caps text-primary mb-2">Street Style</span>
+<h4 class="font-headline-md text-body-lg text-on-surface">Neon Accents</h4>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface/70 backdrop-blur-2xl rounded-xl border border-white/40 shadow-[0_20px_40px_rgba(139,92,246,0.1)] overflow-hidden group">
+<div class="aspect-[4/5] relative overflow-hidden">
+<img alt="Fashion model in elegant coat" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="A high-fashion editorial shot of a young woman walking confidently in a minimalist urban setting. She is wearing an oversized, luxurious pastel coat over a clean, neutral outfit. The environment is bathed in soft, glowing natural light, emphasizing a luminous, ethereal, and premium aesthetic with gentle pink and lavender undertones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhF-jMUGn7iTW93-rXzAXG7ghcAQIdaqFC6KQg2S7fd-ib0S2CXWxfMVqoLWjb3lY73VY8jMEtihyx-pPI3YU7UyMs0foXdq9CPaA7-yvGtOfTMsHzwwxu-0-Fttoe7iR_4_e2_xNHRQxTWUWx86Qk4BJg-XEdT3Ha2424g-3PPnvCw05rkXpdeDTAqSTjRF2xaW4tXLZmJf0AoxBSTDbOEX8gJUFXXRAbb9mlKPfsYXBLpHIHZnoZQ6ov3Tp4PD3rUJZ9wWRneAA">
+<div class="absolute inset-0 bg-gradient-to-t from-surface-dim/80 to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-6 w-full">
+<span class="inline-block px-3 py-1 bg-secondary-fixed/80 backdrop-blur-md rounded-full font-label-caps text-label-caps text-secondary mb-2">Minimalist</span>
+<h4 class="font-headline-md text-body-lg text-on-surface">Pastel Overcoats</h4>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main><button class="fixed bottom-28 right-6 w-16 h-16 rounded-full bg-gradient-to-tr from-secondary-container to-primary shadow-[0_15px_30px_rgba(139,92,246,0.3)] flex items-center justify-center text-white z-40 hover:scale-110 transition-transform active:scale-95 group" aria-label="AI Stylist Chat">
+    <div class="absolute inset-0 rounded-full bg-white/20 blur-sm group-hover:blur-md transition-all"></div>
+    <span class="material-symbols-outlined text-3xl relative z-10" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-3 pb-8 bg-surface/80 backdrop-blur-2xl rounded-t-lg border-t border-white/40 shadow-[0_-10px_30px_rgba(139,92,246,0.1)] z-50">
+<button class="flex flex-col items-center justify-center text-primary bg-primary-container/20 rounded-full px-4 py-1 shadow-[0_0_15px_rgba(132,85,239,0.3)]">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-caps text-label-caps mt-1">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">checkroom</span>
+<span class="font-label-caps text-label-caps mt-1">Try-On</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">auto_awesome</span>
+<span class="font-label-caps text-label-caps mt-1">AI Styles</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">Guitar</span>
+<span class="font-label-caps text-label-caps mt-1">Vault</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant/60 hover:text-secondary transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">person</span>
+<span class="font-label-caps text-label-caps mt-1">Profile</span>
+</button>
+</nav>
+
+
+</body></html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartFit - Profile Setup</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "on-surface-variant": "#494454",
+                        "surface-tint": "#6d3bd7",
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "background": "#fef7ff",
+                        "on-tertiary-container": "#fffbff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary": "#6b38d4",
+                        "surface": "#fef7ff",
+                        "primary-fixed": "#e9ddff",
+                        "tertiary-container": "#a76500",
+                        "primary-container": "#8455ef",
+                        "on-tertiary-fixed": "#2c1700",
+                        "inverse-on-surface": "#f5eefb",
+                        "on-secondary-container": "#76014e",
+                        "outline": "#7b7486",
+                        "error": "#ba1a1a",
+                        "surface-variant": "#e7e0ed",
+                        "surface-container-low": "#f8f1fe",
+                        "on-surface": "#1d1a23",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "inverse-primary": "#d0bcff",
+                        "surface-bright": "#fef7ff",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-container": "#f3ebf8",
+                        "on-primary-container": "#fffbff",
+                        "on-secondary-fixed": "#3d0026",
+                        "on-background": "#1d1a23",
+                        "inverse-surface": "#322f39",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cbc3d7",
+                        "on-secondary-fixed-variant": "#85145a",
+                        "secondary-fixed-dim": "#ffafd3",
+                        "secondary": "#a43073",
+                        "surface-container-high": "#ede5f3",
+                        "surface-container-highest": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "tertiary": "#855000",
+                        "secondary-container": "#fc79bd",
+                        "surface-dim": "#ded7e4",
+                        "on-primary": "#ffffff",
+                        "secondary-fixed": "#ffd8e7",
+                        "tertiary-fixed": "#ffdcbb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "16px",
+                        "stack-md": "16px",
+                        "stack-sm": "8px",
+                        "unit": "8px",
+                        "container-margin-mobile": "20px",
+                        "stack-lg": "32px",
+                        "container-margin-desktop": "40px"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Space Grotesk"],
+                        "body-md": ["Space Grotesk"],
+                        "headline-md": ["Space Grotesk"],
+                        "label-md": ["Space Grotesk"],
+                        "headline-lg": ["Space Grotesk"],
+                        "display-lg": ["Space Grotesk"],
+                        "body-lg": ["Space Grotesk"],
+                        "button-label": ["Space Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "display-lg": ["48px", {"lineHeight": "52px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "button-label": ["16px", {"lineHeight": "20px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #fef7ff;
+            color: #1d1a23;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: #e7e0ed;
+            border-radius: 5px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 24px;
+            height: 24px;
+            background: #6b38d4;
+            cursor: pointer;
+            border-radius: 50%;
+            border: 4px solid #ffffff;
+            box-shadow: 0 4px 12px rgba(107, 56, 212, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md selection:bg-primary-fixed">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 w-full z-50 backdrop-blur-xl bg-surface/80 shadow-[0px_40px_40px_rgba(0,0,0,0.05)] flex items-center justify-between px-container-margin-mobile h-16">
+<button class="active:scale-95 transition-transform hover:opacity-80 transition-opacity flex items-center justify-center p-2">
+<span class="material-symbols-outlined text-primary" data-icon="menu">menu</span>
+</button>
+<h1 class="font-headline-lg text-headline-lg tracking-tight text-primary">SmartFit</h1>
+<button class="active:scale-95 transition-transform hover:opacity-80 transition-opacity flex items-center justify-center p-2">
+<span class="material-symbols-outlined text-primary" data-icon="settings">settings</span>
+</button>
+</header>
+<main class="pt-24 pb-12 px-container-margin-mobile max-w-xl mx-auto min-h-screen flex flex-col">
+<!-- Header Section -->
+<section class="mb-stack-lg">
+<h2 class="font-display-lg text-display-lg text-on-background mb-unit">About You</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant">Help us find your perfect fit with a few simple details.</p>
+</section>
+<!-- Body Type Selection -->
+<section class="mb-stack-lg">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest block mb-stack-sm">Body Type</label>
+<div class="grid grid-cols-3 gap-unit">
+<!-- Slim Option -->
+<button class="group flex flex-col items-center gap-stack-sm p-4 bg-surface-container-lowest border-2 border-transparent hover:border-primary-container rounded-lg transition-all active:scale-95 shadow-sm">
+<div class="w-20 h-28 bg-surface-container-high rounded-lg overflow-hidden mb-2">
+<img class="w-full h-full object-cover" data-alt="A stylized 3D rendered character illustration of a slim male fashion model wearing minimalist streetwear against a clean lavender background. The lighting is soft and studio-quality, emphasizing sleek lines and a modern digital aesthetic with high-key whites and soft purple shadows. The composition is vertical, centered, and editorial in style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD003xBd1ulGKSKcyHvR7KROZKDx_t6aAR1ZUwmdSxawgTxOjsAyycOVZ5iM_X4foKT9A6C_zqya7ikylfdLMKuz1B3m1wVZziNCrsKpaRnbYggh-1TVOG59xU6Eik4ydIvpl8B6URZV4a5GSXJj6e7344LhLrJXCq4H3uFXv0QAN132Iz5zIUHSKj_SF6Hdrw4ikgAWhyPptS71dRQlD76p38wQsHsoqIJrLVYpEMYDp15Pf5ijWxJyaKM_j0fpbMCIHMQTiXdwQM"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary">Slim</span>
+</button>
+<!-- Athletic Option (Active State Example) -->
+<button class="group flex flex-col items-center gap-stack-sm p-4 bg-primary-fixed border-2 border-primary rounded-lg transition-all active:scale-95 shadow-sm">
+<div class="w-20 h-28 bg-surface-container-high rounded-lg overflow-hidden mb-2">
+<img class="w-full h-full object-cover" data-alt="A high-fidelity 3D character design showcasing an athletic physique with defined proportions. The character stands in a confident pose against a bright, airy digital studio environment. The color palette features luminous lavenders and crisp whites, reflecting a premium Gen-Z fashion interface aesthetic. The image is rendered with smooth textures and ambient occlusion shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn2QcapMoYxXoarSheGKRtK0p695dFAFsbARKeTX1AIBfYeQZA_6JS6Dih2DW0dtuWmbxH2ORzWmmirqNPhwQeYv8Ly8JjEgkeY4suebKKxFx6nJmR2cbv2sn1hUbxL8RR8_gMLIEMg3eEMC_hc3pIImkrmdnaHitCsJN8lHklSdj1EttEzCgfrzcsBe_lFW9qfn5RExb4TDX99Fyi2a9nIyBbkjqfhl83zrOnDDSoOUTW45X0ux8gEWEHbVLNqEfITO9iIvfyVXM"/>
+</div>
+<span class="font-label-md text-label-md text-primary font-bold">Athletic</span>
+</button>
+<!-- Broad Option -->
+<button class="group flex flex-col items-center gap-stack-sm p-4 bg-surface-container-lowest border-2 border-transparent hover:border-primary-container rounded-lg transition-all active:scale-95 shadow-sm">
+<div class="w-20 h-28 bg-surface-container-high rounded-lg overflow-hidden mb-2">
+<img class="w-full h-full object-cover" data-alt="A professionally rendered 3D avatar representing a broad body type, featuring wide shoulders and a solid build. The visual style is clean, editorial, and minimalist, set against a soft luminous lavender background. The lighting is bright and optimistic, characteristic of a high-end fashion tech platform. The rendering uses soft shadows and a pristine, clinical yet approachable finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC9TAS3dXxkIWXU-liWBhHeWv0g5o-L498HQnSpHBGTpE-Y-i3EGsSVbUQZOmdpnGxEY5DEU4Fcm3ZBHNptooeIR6grTaVGU3HR8Po-QW8Jmjwth3j6fexWoHLaJaxSCxLwaoHHmMDLlNOPYWxfzX11sezUxDFd37A0HrvkuMvVVAsfRFcpEJGsC0xmEcvU1mWTm_2iHyWsXeY0dyCAMttbxf5hDsqBpcEIh0RbxNHbBxccz973rm9sAUBTUZEEJcbmPCQ7JtOUpFk"/>
+</div>
+<span class="font-label-md text-label-md text-on-surface group-hover:text-primary">Broad</span>
+</button>
+</div>
+</section>
+<!-- Sliders Section -->
+<div class="space-y-stack-lg mb-stack-lg">
+<!-- Height Slider -->
+<div class="p-stack-md bg-surface-container-low rounded-lg shadow-sm border border-outline-variant/30">
+<div class="flex justify-between items-center mb-stack-md">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Height</label>
+<span class="font-headline-md text-headline-md text-primary">182 <span class="text-label-md font-normal text-on-surface-variant">cm</span></span>
+</div>
+<input class="w-full accent-primary" max="220" min="140" type="range" value="182"/>
+<div class="flex justify-between mt-stack-sm text-label-md text-outline">
+<span>140cm</span>
+<span>220cm</span>
+</div>
+</div>
+<!-- Weight Slider -->
+<div class="p-stack-md bg-surface-container-low rounded-lg shadow-sm border border-outline-variant/30">
+<div class="flex justify-between items-center mb-stack-md">
+<label class="font-label-md text-label-md text-on-surface-variant uppercase tracking-widest">Weight</label>
+<span class="font-headline-md text-headline-md text-primary">78 <span class="text-label-md font-normal text-on-surface-variant">kg</span></span>
+</div>
+<input class="w-full accent-primary" max="150" min="40" type="range" value="78"/>
+<div class="flex justify-between mt-stack-sm text-label-md text-outline">
+<span>40kg</span>
+<span>150kg</span>
+</div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-auto pt-stack-lg">
+<button class="w-full bg-[#F472B6] text-white font-button-label text-button-label py-5 rounded-lg shadow-[0px_10px_30px_rgba(244,114,182,0.3)] hover:opacity-90 active:scale-[0.98] transition-all">
+                Finish Setup
+            </button>
+<p class="text-center mt-stack-md font-label-md text-outline">You can always update these later in settings.</p>
+</div>
+</main>
+<!-- Suppressed BottomNavBar and SideNav as this is a transactional onboarding screen -->
+</body></html>
