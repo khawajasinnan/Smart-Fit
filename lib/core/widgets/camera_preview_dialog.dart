@@ -1,10 +1,16 @@
-import 'dart:typed_data';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:camera/camera.dart';
 import 'package:smartfit/core/constants/app_colors.dart';
+import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:smartfit/core/widgets/pose_overlay_painter.dart';
+
 
 class CameraPreviewDialog extends StatefulWidget {
-  const CameraPreviewDialog({super.key});
+  final bool showPoseOverlay;
+  const CameraPreviewDialog({super.key, this.showPoseOverlay = false});
 
   @override
   State<CameraPreviewDialog> createState() => _CameraPreviewDialogState();
@@ -16,10 +22,23 @@ class _CameraPreviewDialogState extends State<CameraPreviewDialog> {
   bool _isInitialized = false;
   bool _isTakingPicture = false;
   int _selectedCameraIdx = 0;
+  
+  PoseDetector? _poseDetector;
+  List<Pose> _detectedPoses = [];
+  bool _isProcessingFrame = false;
+  bool _bodyDetected = false;
 
   @override
   void initState() {
     super.initState();
+    if (widget.showPoseOverlay) {
+      _poseDetector = PoseDetector(
+        options: PoseDetectorOptions(
+          mode: PoseDetectionMode.stream,
+          model: PoseDetectionModel.base,
+        ),
+      );
+    }
     _initCamera();
   }
 
@@ -52,9 +71,86 @@ class _CameraPreviewDialogState extends State<CameraPreviewDialog> {
       await _controller!.initialize();
       if (mounted) {
         setState(() => _isInitialized = true);
+        if (widget.showPoseOverlay && _controller != null) {
+          _controller!.startImageStream(_processFrame);
+        }
       }
     } catch (e) {
       debugPrint("Camera controller error: $e");
+    }
+  }
+  
+  static final Map<DeviceOrientation, int> _orientations = {
+    DeviceOrientation.portraitUp: 0,
+    DeviceOrientation.landscapeLeft: 90,
+    DeviceOrientation.portraitDown: 180,
+    DeviceOrientation.landscapeRight: 270,
+  };
+
+  Future<void> _processFrame(CameraImage image) async {
+    if (_isProcessingFrame || _poseDetector == null || !_isInitialized) return;
+    _isProcessingFrame = true;
+
+    try {
+      if (_cameras.isEmpty || _selectedCameraIdx >= _cameras.length) return;
+      final camera = _cameras[_selectedCameraIdx];
+      final inputImage = _convertCameraImage(image, camera);
+      if (inputImage == null) return;
+
+      final poses = await _poseDetector!.processImage(inputImage);
+      if (mounted) {
+        setState(() {
+          _detectedPoses = poses;
+          _bodyDetected = poses.isNotEmpty;
+        });
+      }
+    } catch (e) {
+      // Gracefully catch any frame-level conversion or detection errors
+    } finally {
+      _isProcessingFrame = false;
+    }
+  }
+
+  InputImage? _convertCameraImage(CameraImage image, CameraDescription camera) {
+    try {
+      final sensorOrientation = camera.sensorOrientation;
+      InputImageRotation? rotation;
+      if (Platform.isIOS) {
+        rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
+      } else if (Platform.isAndroid) {
+        final deviceOrientation = _controller?.value.deviceOrientation ?? DeviceOrientation.portraitUp;
+        var rotationCompensation = _orientations[deviceOrientation] ?? 0;
+        if (camera.lensDirection == CameraLensDirection.front) {
+          rotationCompensation = (sensorOrientation + rotationCompensation) % 360;
+        } else {
+          rotationCompensation = (sensorOrientation - rotationCompensation + 360) % 360;
+        }
+        rotation = InputImageRotationValue.fromRawValue(rotationCompensation);
+      }
+      rotation ??= InputImageRotationValue.fromRawValue(sensorOrientation);
+      if (rotation == null) return null;
+
+      final format = InputImageFormatValue.fromRawValue(image.format.raw);
+      final fallbackFormat = Platform.isAndroid ? InputImageFormat.nv21 : InputImageFormat.bgra8888;
+
+      // Concatenate all plane bytes (crucial for multi-plane YUV_420_888 on Android)
+      final WriteBuffer allBytes = WriteBuffer();
+      for (final Plane plane in image.planes) {
+        allBytes.putUint8List(plane.bytes);
+      }
+      final bytes = allBytes.done().buffer.asUint8List();
+
+      return InputImage.fromBytes(
+        bytes: bytes,
+        metadata: InputImageMetadata(
+          size: Size(image.width.toDouble(), image.height.toDouble()),
+          rotation: rotation,
+          format: format ?? fallbackFormat,
+          bytesPerRow: image.planes.first.bytesPerRow,
+        ),
+      );
+    } catch (_) {
+      return null;
     }
   }
 
@@ -72,6 +168,10 @@ class _CameraPreviewDialogState extends State<CameraPreviewDialog> {
     if (!_isInitialized || _controller == null || _controller!.value.isTakingPicture) {
       return;
     }
+    // Stop pose detection stream before capturing
+    if (widget.showPoseOverlay) {
+      await _controller!.stopImageStream();
+    }
 
     setState(() => _isTakingPicture = true);
     try {
@@ -88,6 +188,7 @@ class _CameraPreviewDialogState extends State<CameraPreviewDialog> {
 
   @override
   void dispose() {
+    _poseDetector?.close();
     _controller?.dispose();
     super.dispose();
   }
@@ -119,6 +220,59 @@ class _CameraPreviewDialogState extends State<CameraPreviewDialog> {
                 child: CameraPreview(_controller!),
               ),
             ),
+            
+            if (widget.showPoseOverlay && _detectedPoses.isNotEmpty)
+              Positioned.fill(
+                child: CustomPaint(
+                  painter: PoseOverlayPainter(
+                    poses: _detectedPoses,
+                    imageSize: Size(
+                      _controller!.value.previewSize!.height,
+                      _controller!.value.previewSize!.width,
+                    ),
+                    rotation: InputImageRotation.rotation0deg,
+                    isFrontCamera: _cameras[_selectedCameraIdx].lensDirection == CameraLensDirection.front,
+                  ),
+                ),
+              ),
+
+            // Body detection status indicator
+            if (widget.showPoseOverlay)
+              Positioned(
+                bottom: 110,
+                left: 0,
+                right: 0,
+                child: Center(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: _bodyDetected 
+                        ? Colors.green.withValues(alpha: 0.8)
+                        : Colors.orange.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _bodyDetected ? Icons.check_circle : Icons.person_search,
+                          color: Colors.white,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          _bodyDetected ? 'Body Detected ✓' : 'Position yourself in frame...',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             
             // Top Controls
             Positioned(

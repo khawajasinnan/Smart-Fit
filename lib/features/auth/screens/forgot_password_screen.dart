@@ -8,9 +8,11 @@ import 'package:smartfit/core/constants/app_strings.dart';
 import 'package:smartfit/core/constants/app_text_styles.dart';
 import 'package:smartfit/core/router/app_router.dart';
 import 'package:smartfit/core/utils/validators.dart';
+import 'package:smartfit/core/widgets/clothing_pattern_background.dart';
 import 'package:smartfit/core/widgets/sf_button.dart';
 import 'package:smartfit/core/widgets/sf_text_field.dart';
 import 'package:smartfit/features/auth/providers/auth_provider.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -102,11 +104,21 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     return Scaffold(
       appBar: AppBar(leading: IconButton(icon: const Icon(Icons.arrow_back_rounded), onPressed: () => context.go(RoutePaths.login), tooltip: 'Back')),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: _buildBody(isDark, isLoading),
-        ),
+      body: Stack(
+        children: [
+          const Positioned.fill(
+            child: ClothingPatternBackground(
+              opacity: 0.055,
+              color: Color(0xFFFF2E93),
+            ),
+          ),
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: _buildBody(isDark, isLoading),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -136,9 +148,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           const SizedBox(height: 32),
           SFTextField(controller: _emailController, labelText: AppStrings.email, hintText: 'you@example.com', prefixIcon: const Icon(Icons.email_outlined), keyboardType: TextInputType.emailAddress, validator: Validators.email, semanticsLabel: 'Email for password reset'),
           const SizedBox(height: 32),
-          SFButton(label: AppStrings.sendResetLink, onPressed: _sendResetLink, isLoading: isLoading),
+          SFButton(label: AppStrings.sendOtpCode, onPressed: _sendResetLink, isLoading: isLoading),
         ],
-      ),
+      ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1, end: 0, curve: Curves.easeOutQuad),
     );
   }
 
@@ -206,7 +218,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: 12),
         TextButton(onPressed: () { setState(() => _step = 1); }, child: const Text('Back')),
       ],
-    );
+    ).animate().fadeIn(duration: 400.ms).slideX(begin: 0.05, end: 0, curve: Curves.easeOutQuad);
   }
 
   Widget _buildSetPasswordView(bool isDark, bool isLoading) {
@@ -249,7 +261,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         const SizedBox(height: 12),
         TextButton(onPressed: () { setState(() => _step = 2); }, child: const Text('Back')),
       ],
-    );
+    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.05, end: 0, curve: Curves.easeOutQuad);
   }
 
   

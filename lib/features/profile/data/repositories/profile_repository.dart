@@ -30,18 +30,22 @@ class ProfileRepository {
     }
   }
 
-  Future<String?> uploadAvatar(
+  Future<String> uploadAvatar(
     String userId,
     Uint8List imageBytes, {
     String ext = 'jpg',
   }) async {
-    final path = '$userId/avatar.$ext';
+    final version = DateTime.now().millisecondsSinceEpoch;
+    final path = '$userId/avatar_$version.$ext';
+    final contentType = ext.toLowerCase() == 'jpg'
+        ? 'image/jpeg'
+        : 'image/$ext';
     await _client.storage
         .from(ApiEndpoints.avatarsBucket)
         .uploadBinary(
           path,
           imageBytes,
-          fileOptions: FileOptions(upsert: true, contentType: 'image/$ext'),
+          fileOptions: FileOptions(upsert: true, contentType: contentType),
         );
     final url = _client.storage
         .from(ApiEndpoints.avatarsBucket)

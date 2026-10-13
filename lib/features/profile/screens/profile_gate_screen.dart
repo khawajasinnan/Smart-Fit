@@ -5,7 +5,9 @@ import 'package:smartfit/core/constants/app_colors.dart';
 import 'package:smartfit/core/constants/app_strings.dart';
 import 'package:smartfit/core/constants/app_text_styles.dart';
 import 'package:smartfit/core/router/app_router.dart';
+import 'package:smartfit/core/constants/api_endpoints.dart';
 import 'package:smartfit/core/providers/supabase_provider.dart';
+import 'package:smartfit/core/widgets/clothing_pattern_background.dart';
 import 'package:smartfit/core/widgets/sf_button.dart';
 import 'package:smartfit/features/profile/providers/profile_provider.dart';
 
@@ -49,70 +51,83 @@ class ProfileGateScreen extends ConsumerWidget {
       data: (profile) {
         final isComplete = profile?.isProfileComplete ?? false;
         if (isComplete) {
+          // Check if current user is admin → route to admin panel
+          final isAdmin = (user.email ?? '').toLowerCase() ==
+              ApiEndpoints.adminEmail.toLowerCase();
           WidgetsBinding.instance.addPostFrameCallback(
-            (_) => context.go(RoutePaths.home),
+            (_) => context.go(isAdmin ? RoutePaths.admin : RoutePaths.home),
           );
           return const SizedBox.shrink();
         }
         // Profile not complete — show gate
         return Scaffold(
-          body: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Icon(
-                      Icons.person_add_rounded,
-                      size: 56,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  Text(
-                    AppStrings.profileSetupTitle,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.headlineMd.copyWith(
-                      color: isDark
-                          ? AppColors.darkOnSurface
-                          : AppColors.lightOnSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    AppStrings.profileSetupSubtitle,
-                    textAlign: TextAlign.center,
-                    style: AppTextStyles.bodyMd.copyWith(
-                      color: isDark
-                          ? AppColors.darkOnSurfaceVariant
-                          : AppColors.lightOnSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  SFButton(
-                    label: 'Set Up Profile',
-                    icon: Icons.arrow_forward_rounded,
-                    onPressed: () => context.go(RoutePaths.profileSetup),
-                  ),
-                  const SizedBox(height: 16),
-                  Text(
-                    'This is required to use SmartFit',
-                    style: AppTextStyles.labelMd.copyWith(
-                      color: isDark
-                          ? AppColors.darkOnSurfaceVariant
-                          : AppColors.lightOnSurfaceVariant,
-                    ),
-                  ),
-                ],
+          body: Stack(
+            children: [
+              const Positioned.fill(
+                child: ClothingPatternBackground(
+                  opacity: 0.055,
+                  color: Color(0xFFFF2E93),
+                ),
               ),
-            ),
+              SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          gradient: AppColors.primaryGradient,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: const Icon(
+                          Icons.person_add_rounded,
+                          size: 56,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      Text(
+                        AppStrings.profileSetupTitle,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.headlineMd.copyWith(
+                          color: isDark
+                              ? AppColors.darkOnSurface
+                              : AppColors.lightOnSurface,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        AppStrings.profileSetupSubtitle,
+                        textAlign: TextAlign.center,
+                        style: AppTextStyles.bodyMd.copyWith(
+                          color: isDark
+                              ? AppColors.darkOnSurfaceVariant
+                              : AppColors.lightOnSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      SFButton(
+                        label: 'Set Up Profile',
+                        icon: Icons.arrow_forward_rounded,
+                        onPressed: () => context.go(RoutePaths.profileSetup),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'This is required to use SmartFit',
+                        style: AppTextStyles.labelMd.copyWith(
+                          color: isDark
+                              ? AppColors.darkOnSurfaceVariant
+                              : AppColors.lightOnSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         );
       },

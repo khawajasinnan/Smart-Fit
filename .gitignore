@@ -15,8 +15,12 @@ migrate_working_dir/
 .codex/
 .env
 .env.*
-!.env.example
-
+.env.example
+.venv
+venv
+.env
+assets
+datasets
 # IntelliJ related
 *.iml
 *.ipr

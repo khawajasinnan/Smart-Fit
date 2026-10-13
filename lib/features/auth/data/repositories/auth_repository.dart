@@ -17,18 +17,71 @@ class AuthRepository {
     required String email,
     required String password,
     required String fullName,
+    required String username,
     required DateTime dateOfBirth,
   }) async {
     final normalizedEmail = email.trim().toLowerCase();
+    final normalizedUsername = username.trim().toLowerCase();
     final response = await _client.auth.signUp(
       email: normalizedEmail,
       password: password,
       data: {
         'full_name': fullName,
+        'username': normalizedUsername,
         'date_of_birth': dateOfBirth.toIso8601String(),
       },
     );
+    if (response.user != null) {
+      try {
+        await _client.from('profiles').upsert({
+          'id': response.user!.id,
+          'email': normalizedEmail,
+          'full_name': fullName.trim(),
+          'username': normalizedUsername,
+          'date_of_birth': dateOfBirth.toIso8601String(),
+        }, onConflict: 'id');
+      } catch (_) {}
+    }
     return response;
+  }
+
+  Future<String?> emailForUsername(String username) async {
+    final normalized = username.trim().toLowerCase();
+    final response = await _client.rpc(
+      'email_for_username',
+      params: {'username_input': normalized},
+    );
+    return response as String?;
+  }
+
+  Future<Map<String, dynamic>?> userRestriction(String userId) async {
+    final response = await _client
+        .from('profiles')
+        .select('is_banned, ban_reason, suspended_until, suspension_reason')
+        .eq('id', userId)
+        .maybeSingle();
+    if (response == null) return null;
+    if (response['is_banned'] == true) {
+      return {
+        'type': 'banned',
+        'message':
+            'You have violated the rules and regulations. You are banned.',
+      };
+    }
+    final suspendedUntilRaw = response['suspended_until'];
+    if (suspendedUntilRaw != null) {
+      final suspendedUntil = DateTime.tryParse(suspendedUntilRaw.toString());
+      if (suspendedUntil != null &&
+          suspendedUntil.isAfter(DateTime.now().toUtc())) {
+        return {
+          'type': 'suspended',
+          'until': suspendedUntil.toIso8601String(),
+          'message':
+              'Your account is suspended until ${suspendedUntil.toLocal()}. If you violate the rules and regulations again, your account may be permanently banned.',
+        };
+      }
+    }
+    return null;
   }
 
   /// Upload avatar to Supabase storage and return public URL
@@ -104,16 +157,29 @@ class AuthRepository {
     await _client.auth.updateUser(UserAttributes(data: data));
   }
 
+  Future<void> updateAccountName(String fullName) async {
+    await _client.auth.updateUser(
+      UserAttributes(data: {'full_name': fullName.trim()}),
+    );
+  }
+
   /// Reset user password after recovery flow
   Future<void> resetUserPassword(String password) async {
     await _client.auth.updateUser(UserAttributes(password: password));
   }
 
-  /// Sign in with email + password
-  Future<AuthResponse> signInWithEmail({
-    required String email,
+  /// Sign in with email/username + password
+  Future<AuthResponse> signInWithIdentifier({
+    required String identifier,
     required String password,
   }) async {
+    final trimmed = identifier.trim();
+    final email = trimmed.contains('@')
+        ? trimmed.toLowerCase()
+        : await emailForUsername(trimmed);
+    if (email == null || email.isEmpty) {
+      throw const AuthException('No account found for that username.');
+    }
     final response = await _client.auth.signInWithPassword(
       email: email,
       password: password,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smartfit/core/constants/app_colors.dart';
 import 'package:smartfit/core/router/app_router.dart';
+import 'package:smartfit/core/widgets/clothing_pattern_background.dart';
 import 'package:smartfit/core/widgets/safe_network_image.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -102,6 +103,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> with SingleTickerPr
                 ],
               );
             },
+          ),
+
+          // ── Pink Clothing Icons Low-Opacity Background ──
+          const Positioned.fill(
+            child: ClothingPatternBackground(
+              opacity: 0.05,
+              color: Color(0xFFFF2E93),
+            ),
           ),
           
           // Skip Button

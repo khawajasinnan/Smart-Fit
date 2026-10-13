@@ -12,24 +12,87 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================================
 CREATE TABLE IF NOT EXISTS public.profiles (
   id            UUID        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  email         TEXT,
+  username      TEXT        UNIQUE,
   full_name     TEXT        NOT NULL DEFAULT '',
   date_of_birth DATE,
   gender        TEXT,
+  phone         TEXT,
   height        DECIMAL(5,2),
   weight        DECIMAL(5,2),
+  height_cm     DECIMAL(5,2),
+  weight_kg     DECIMAL(5,2),
   body_type     TEXT,
   avatar_url    TEXT,
+  photo_url     TEXT,
+  skin_tone     TEXT,
+  chest_cm      DECIMAL(5,2),
+  waist_cm      DECIMAL(5,2),
+  hip_cm        DECIMAL(5,2),
   style_vibe    TEXT        DEFAULT 'Clean',
+  style_preferences TEXT[]  DEFAULT '{}',
+  preferred_colors  TEXT[]  DEFAULT '{}',
+  budget_min    INTEGER,
+  budget_max    INTEGER,
+  occasions     TEXT[]      DEFAULT '{}',
+  is_banned     BOOLEAN     DEFAULT FALSE,
+  ban_reason    TEXT,
+  banned_at     TIMESTAMPTZ,
+  suspended_until TIMESTAMPTZ,
+  suspension_reason TEXT,
+  suspended_at  TIMESTAMPTZ,
+  ethnicity     TEXT,
   profile_completed BOOLEAN   DEFAULT FALSE,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS email TEXT,
+  ADD COLUMN IF NOT EXISTS username TEXT,
+  ADD COLUMN IF NOT EXISTS phone TEXT,
+  ADD COLUMN IF NOT EXISTS height_cm DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS weight_kg DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS photo_url TEXT,
+  ADD COLUMN IF NOT EXISTS skin_tone TEXT,
+  ADD COLUMN IF NOT EXISTS chest_cm DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS waist_cm DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS hip_cm DECIMAL(5,2),
+  ADD COLUMN IF NOT EXISTS style_preferences TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS preferred_colors TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS budget_min INTEGER,
+  ADD COLUMN IF NOT EXISTS budget_max INTEGER,
+  ADD COLUMN IF NOT EXISTS occasions TEXT[] DEFAULT '{}',
+  ADD COLUMN IF NOT EXISTS is_banned BOOLEAN DEFAULT FALSE,
+  ADD COLUMN IF NOT EXISTS ban_reason TEXT,
+  ADD COLUMN IF NOT EXISTS banned_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS suspended_until TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS suspension_reason TEXT,
+  ADD COLUMN IF NOT EXISTS suspended_at TIMESTAMPTZ,
+  ADD COLUMN IF NOT EXISTS ethnicity TEXT;
+
+CREATE UNIQUE INDEX IF NOT EXISTS profiles_username_unique
+  ON public.profiles (LOWER(username))
+  WHERE username IS NOT NULL AND username <> '';
+
+CREATE OR REPLACE FUNCTION public.email_for_username(username_input TEXT)
+RETURNS TEXT AS $$
+  SELECT email
+  FROM public.profiles
+  WHERE LOWER(username) = LOWER(username_input)
+  LIMIT 1;
+$$ LANGUAGE SQL STABLE SECURITY DEFINER;
+
+CREATE OR REPLACE FUNCTION public.is_smartfit_admin()
+RETURNS BOOLEAN AS $$
+  SELECT LOWER(COALESCE(auth.jwt() ->> 'email', '')) = 'admin@smartfit.pk';
+$$ LANGUAGE SQL STABLE SECURITY DEFINER;
+
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can view own profile"
   ON public.profiles FOR SELECT
-  USING (auth.uid() = id);
+  USING (auth.uid() = id OR public.is_smartfit_admin());
 
 CREATE POLICY "Users can insert own profile"
   ON public.profiles FOR INSERT
@@ -37,8 +100,8 @@ CREATE POLICY "Users can insert own profile"
 
 CREATE POLICY "Users can update own profile"
   ON public.profiles FOR UPDATE
-  USING (auth.uid() = id)
-  WITH CHECK (auth.uid() = id);
+  USING (auth.uid() = id OR public.is_smartfit_admin())
+  WITH CHECK (auth.uid() = id OR public.is_smartfit_admin());
 
 CREATE POLICY "Users can delete own profile"
   ON public.profiles FOR DELETE
@@ -75,12 +138,14 @@ CREATE TABLE IF NOT EXISTS public.chat_messages (
   image_urls JSONB       NOT NULL DEFAULT '[]'::jsonb,
   metadata   JSONB,
   image_url  TEXT,
+  reviewed_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 ALTER TABLE public.chat_messages
   ADD COLUMN IF NOT EXISTS image_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
-  ADD COLUMN IF NOT EXISTS metadata JSONB;
+  ADD COLUMN IF NOT EXISTS metadata JSONB,
+  ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ;
 
 ALTER TABLE public.chat_messages ENABLE ROW LEVEL SECURITY;
 
@@ -100,6 +165,39 @@ CREATE POLICY "Users can manage own chat messages"
         AND cs.user_id = auth.uid()
     )
   );
+
+CREATE POLICY "Admin can view all chat sessions"
+  ON public.chat_sessions FOR SELECT
+  USING (public.is_smartfit_admin());
+
+CREATE POLICY "Admin can view all chat messages"
+  ON public.chat_messages FOR SELECT
+  USING (public.is_smartfit_admin());
+
+CREATE POLICY "Admin can update chat reviews"
+  ON public.chat_messages FOR UPDATE
+  USING (public.is_smartfit_admin())
+  WITH CHECK (public.is_smartfit_admin());
+
+CREATE OR REPLACE FUNCTION public.admin_mark_message_reviewed(message_id_input UUID)
+RETURNS VOID AS $$
+BEGIN
+  IF NOT public.is_smartfit_admin() THEN
+    RAISE EXCEPTION 'admin only';
+  END IF;
+
+  UPDATE public.chat_messages
+  SET
+    reviewed_at = NOW(),
+    metadata = jsonb_set(
+      COALESCE(metadata, '{}'::jsonb),
+      '{moderation,review_status}',
+      '"reviewed"',
+      true
+    )
+  WHERE id = message_id_input;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
 
 -- ============================================================
@@ -283,6 +381,51 @@ DROP TRIGGER IF EXISTS chat_sessions_updated_at ON public.chat_sessions;
 CREATE TRIGGER chat_sessions_updated_at
   BEFORE UPDATE ON public.chat_sessions
   FOR EACH ROW EXECUTE PROCEDURE public.set_updated_at();
+
+CREATE OR REPLACE FUNCTION public.touch_chat_session_from_message()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+  UPDATE public.chat_sessions
+  SET updated_at = NOW()
+  WHERE id = NEW.session_id;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS chat_messages_touch_session ON public.chat_messages;
+CREATE TRIGGER chat_messages_touch_session
+  AFTER INSERT ON public.chat_messages
+  FOR EACH ROW EXECUTE PROCEDURE public.touch_chat_session_from_message();
+
+
+-- ============================================================
+-- STEP 10: SAVED PRODUCTS (Wardrobe) TABLE
+-- ============================================================
+CREATE TABLE IF NOT EXISTS public.saved_products (
+  id            UUID        PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id       UUID        NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  product_data  JSONB       NOT NULL,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS saved_products_user_id_idx
+  ON public.saved_products (user_id);
+
+ALTER TABLE public.saved_products ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own saved products"
+  ON public.saved_products FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own saved products"
+  ON public.saved_products FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own saved products"
+  ON public.saved_products FOR DELETE
+  USING (auth.uid() = user_id);
 
 
 -- ============================================================

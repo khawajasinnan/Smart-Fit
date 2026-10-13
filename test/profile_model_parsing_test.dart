@@ -46,35 +46,39 @@ void main() {
     },
   );
 
-  test(
-    'profile completion supports saved flag and fully filled setup data',
-    () {
-      final flaggedProfile = UserProfileModel.fromJson({
-        'id': 'user-1',
-        'profile_completed': true,
-      });
-      expect(flaggedProfile.isProfileComplete, true);
+  test('profile completion requires recommendation-critical setup data', () {
+    final flaggedProfile = UserProfileModel.fromJson({
+      'id': 'user-1',
+      'profile_completed': true,
+    });
+    expect(flaggedProfile.isProfileComplete, true);
 
-      final completedLegacyProfile = UserProfileModel.fromJson({
-        'id': 'user-2',
-        'gender': 'Male',
-        'height': 180,
-        'weight': 82,
-        'body_type': 'Athletic',
-        'style_vibe': 'Clean',
-      });
-      expect(completedLegacyProfile.stylePreferences, ['Clean']);
-      expect(completedLegacyProfile.isProfileComplete, true);
+    final completedProfile = UserProfileModel.fromJson({
+      'id': 'user-2',
+      'gender': 'Male',
+      'phone': '+923001234567',
+      'height': 180,
+      'weight': 82,
+      'body_type': 'Athletic',
+      'avatar_url': 'https://example.com/a.jpg',
+      'skin_tone': 'Medium',
+      'ethnicity': 'Punjabi',
+      'chest_cm': 100,
+      'waist_cm': 84,
+      'hip_cm': 98,
+      'style_vibe': 'Clean',
+    });
+    expect(completedProfile.stylePreferences, ['Clean']);
+    expect(completedProfile.isProfileComplete, true);
 
-      final partialProfile = UserProfileModel.fromJson({
-        'id': 'user-3',
-        'gender': 'Female',
-        'height_cm': 165,
-        'body_type': 'Slim',
-      });
-      expect(partialProfile.isProfileComplete, false);
-    },
-  );
+    final partialProfile = UserProfileModel.fromJson({
+      'id': 'user-3',
+      'gender': 'Female',
+      'height_cm': 165,
+      'body_type': 'Slim',
+    });
+    expect(partialProfile.isProfileComplete, false);
+  });
 
   test('toLegacyJson writes columns used by the bundled Supabase schema', () {
     final profile = UserProfileModel(

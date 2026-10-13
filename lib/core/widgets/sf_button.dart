@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:smartfit/core/constants/app_colors.dart';
 import 'package:smartfit/core/constants/app_text_styles.dart';
 
@@ -6,7 +7,7 @@ import 'package:smartfit/core/constants/app_text_styles.dart';
 /// Light-only design — Luminous Vibe aesthetic
 enum SFButtonVariant { primary, ghost, outline, danger }
 
-class SFButton extends StatelessWidget {
+class SFButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
   final SFButtonVariant variant;
@@ -29,49 +30,66 @@ class SFButton extends StatelessWidget {
   });
 
   @override
+  State<SFButton> createState() => _SFButtonState();
+}
+
+class _SFButtonState extends State<SFButton> {
+  bool _isPressed = false;
+
+  @override
   Widget build(BuildContext context) {
     return Semantics(
-      label: label,
+      label: widget.label,
       button: true,
       child: Tooltip(
-        message: label,
-        child: Container(
-          width: width ?? double.infinity,
-          height: height,
-          decoration: _buildDecoration(),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: isLoading ? null : onPressed,
-              borderRadius: BorderRadius.circular(9999),
-              child: Center(
-                child: isLoading
-                    ? SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          valueColor: AlwaysStoppedAnimation(
-                            _foregroundColor(),
-                          ),
-                        ),
-                      )
-                    : Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (icon != null) ...[
-                            Icon(icon, size: 20, color: _foregroundColor()),
-                            const SizedBox(width: 8),
-                          ],
-                          Text(
-                            label,
-                            style: AppTextStyles.buttonLg.copyWith(
-                              color: _foregroundColor(),
+        message: widget.label,
+        child: GestureDetector(
+          onTapDown: (_) => setState(() => _isPressed = true),
+          onTapUp: (_) {
+            setState(() => _isPressed = false);
+            HapticFeedback.lightImpact();
+            widget.onPressed?.call();
+          },
+          onTapCancel: () => setState(() => _isPressed = false),
+          child: AnimatedScale(
+            scale: _isPressed ? 0.96 : 1.0,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeInOut,
+            child: Container(
+              width: widget.width ?? double.infinity,
+              height: widget.height,
+              decoration: _buildDecoration(),
+              child: Material(
+                color: Colors.transparent,
+                child: Center(
+                  child: widget.isLoading
+                      ? SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2.5,
+                            valueColor: AlwaysStoppedAnimation(
+                              _foregroundColor(),
                             ),
                           ),
-                        ],
-                      ),
+                        )
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (widget.icon != null) ...[
+                              Icon(widget.icon, size: 20, color: _foregroundColor()),
+                              const SizedBox(width: 8),
+                            ],
+                            Text(
+                              widget.label,
+                              style: AppTextStyles.buttonLg.copyWith(
+                                color: _foregroundColor(),
+                              ),
+                            ),
+                          ],
+                        ),
+                ),
               ),
             ),
           ),
@@ -81,12 +99,12 @@ class SFButton extends StatelessWidget {
   }
 
   BoxDecoration _buildDecoration() {
-    switch (variant) {
+    switch (widget.variant) {
       case SFButtonVariant.primary:
         return BoxDecoration(
           color: AppColors.primary,
           borderRadius: BorderRadius.circular(9999),
-          boxShadow: showGlow && onPressed != null
+          boxShadow: widget.showGlow && widget.onPressed != null
               ? [
                   BoxShadow(
                     color: AppColors.primary.withValues(alpha: 0.3),
@@ -122,7 +140,7 @@ class SFButton extends StatelessWidget {
   }
 
   Color _foregroundColor() {
-    switch (variant) {
+    switch (widget.variant) {
       case SFButtonVariant.primary:
         return Colors.white;
       case SFButtonVariant.ghost:

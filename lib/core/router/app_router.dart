@@ -11,6 +11,11 @@ import 'package:smartfit/features/profile/screens/profile_setup_screen.dart';
 import 'package:smartfit/features/chat/screens/ai_stylist_chat_screen.dart';
 import 'package:smartfit/features/home/screens/home_dashboard_screen.dart';
 import 'package:smartfit/features/settings/screens/settings_screen.dart';
+import 'package:smartfit/features/admin/screens/admin_panel_screen.dart';
+import 'package:smartfit/features/wardrobe/screens/wardrobe_screen.dart';
+import 'package:smartfit/features/tryon/screens/tryon_screen.dart';
+import 'package:smartfit/features/hairstyle/screens/hairstyle_screen.dart';
+import 'package:smartfit/features/look_score/screens/look_score_screen.dart';
 
 /// Route paths
 class RoutePaths {
@@ -25,6 +30,11 @@ class RoutePaths {
   static const String chat = '/chat';
   static const String home = '/home';
   static const String settings = '/settings';
+  static const String admin = '/admin';
+  static const String wardrobe = '/wardrobe';
+  static const String tryOn = '/try-on';
+  static const String hairstyle = '/hairstyle';
+  static const String lookScore = '/look-score';
 }
 
 /// GoRouter provider
@@ -82,6 +92,31 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         path: RoutePaths.settings,
         name: 'settings',
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.admin,
+        name: 'admin',
+        builder: (context, state) => const AdminPanelScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.wardrobe,
+        name: 'wardrobe',
+        builder: (context, state) => const WardrobeScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.tryOn,
+        name: 'tryOn',
+        builder: (context, state) => const TryOnScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.hairstyle,
+        name: 'hairstyle',
+        builder: (context, state) => const HairstyleScreen(),
+      ),
+      GoRoute(
+        path: RoutePaths.lookScore,
+        name: 'lookScore',
+        builder: (context, state) => const LookScoreScreen(),
       ),
     ],
 

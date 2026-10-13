@@ -12,7 +12,8 @@ class ProfileNotifier extends StateNotifier<AsyncValue<UserProfileModel?>> {
   final ProfileRepository _repo;
   final String _userId;
 
-  ProfileNotifier(this._repo, this._userId) : super(const AsyncValue.loading()) {
+  ProfileNotifier(this._repo, this._userId)
+    : super(const AsyncValue.loading()) {
     loadProfile();
   }
 
@@ -35,12 +36,8 @@ class ProfileNotifier extends StateNotifier<AsyncValue<UserProfileModel?>> {
     }
   }
 
-  Future<String?> uploadAvatar(Uint8List bytes) async {
-    try {
-      return await _repo.uploadAvatar(_userId, bytes);
-    } catch (e) {
-      return null;
-    }
+  Future<String> uploadAvatar(Uint8List bytes) {
+    return _repo.uploadAvatar(_userId, bytes);
   }
 
   void updateLocal(UserProfileModel profile) {
@@ -48,7 +45,12 @@ class ProfileNotifier extends StateNotifier<AsyncValue<UserProfileModel?>> {
   }
 }
 
-final profileNotifierProvider = StateNotifierProvider.family<ProfileNotifier, AsyncValue<UserProfileModel?>, String>((ref, userId) {
-  final repo = ref.watch(profileRepositoryProvider);
-  return ProfileNotifier(repo, userId);
-});
+final profileNotifierProvider =
+    StateNotifierProvider.family<
+      ProfileNotifier,
+      AsyncValue<UserProfileModel?>,
+      String
+    >((ref, userId) {
+      final repo = ref.watch(profileRepositoryProvider);
+      return ProfileNotifier(repo, userId);
+    });

@@ -1,6 +1,8 @@
 class UserProfileModel {
   final String id;
   final String? fullName;
+  final String? username;
+  final String? email;
   final DateTime? dateOfBirth;
   final String? gender;
   final String? phone;
@@ -12,16 +14,21 @@ class UserProfileModel {
   final double? chestCm;
   final double? waistCm;
   final double? hipCm;
+  final String? ethnicity;
   final List<String> stylePreferences;
   final List<String> preferredColors;
   final int? budgetMin;
   final int? budgetMax;
   final List<String> occasions;
   final bool profileCompleted;
+  final bool isBanned;
+  final String? banReason;
 
   const UserProfileModel({
     required this.id,
     this.fullName,
+    this.username,
+    this.email,
     this.dateOfBirth,
     this.gender,
     this.phone,
@@ -33,12 +40,15 @@ class UserProfileModel {
     this.chestCm,
     this.waistCm,
     this.hipCm,
+    this.ethnicity,
     this.stylePreferences = const [],
     this.preferredColors = const [],
     this.budgetMin,
     this.budgetMax,
     this.occasions = const [],
     this.profileCompleted = false,
+    this.isBanned = false,
+    this.banReason,
   });
 
   factory UserProfileModel.fromJson(Map<String, dynamic> json) {
@@ -83,6 +93,8 @@ class UserProfileModel {
     return UserProfileModel(
       id: json['id'] as String,
       fullName: json['full_name'] as String?,
+      username: json['username'] as String?,
+      email: json['email'] as String?,
       dateOfBirth: json['date_of_birth'] != null
           ? DateTime.tryParse(json['date_of_birth'] as String)
           : null,
@@ -96,6 +108,7 @@ class UserProfileModel {
       chestCm: parseDouble(chestVal),
       waistCm: parseDouble(waistVal),
       hipCm: parseDouble(hipVal),
+      ethnicity: json['ethnicity'] as String?,
       stylePreferences: parseStringList(
         json['style_preferences'] ?? json['style_vibe'],
       ),
@@ -106,12 +119,16 @@ class UserProfileModel {
       profileCompleted: parseBool(
         json['profile_completed'] ?? json['is_complete'],
       ),
+      isBanned: parseBool(json['is_banned']),
+      banReason: json['ban_reason'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() => {
     'id': id,
     'full_name': fullName,
+    'username': username,
+    'email': email,
     'date_of_birth': dateOfBirth?.toIso8601String(),
     'gender': gender,
     'phone': phone,
@@ -120,20 +137,26 @@ class UserProfileModel {
     'body_type': bodyType,
     'skin_tone': skinTone,
     'photo_url': photoUrl,
+    'avatar_url': photoUrl,
     'chest_cm': chestCm,
     'waist_cm': waistCm,
     'hip_cm': hipCm,
+    'ethnicity': ethnicity,
     'style_preferences': stylePreferences,
     'preferred_colors': preferredColors,
     'budget_min': budgetMin,
     'budget_max': budgetMax,
     'occasions': occasions,
     'profile_completed': profileCompleted,
+    'is_banned': isBanned,
+    'ban_reason': banReason,
   };
 
   Map<String, dynamic> toLegacyJson() => {
     'id': id,
     if (fullName != null) 'full_name': fullName,
+    if (username != null) 'username': username,
+    if (email != null) 'email': email,
     if (dateOfBirth != null) 'date_of_birth': dateOfBirth!.toIso8601String(),
     if (gender != null) 'gender': gender,
     if (heightCm != null) 'height': heightCm,
@@ -141,6 +164,7 @@ class UserProfileModel {
     if (bodyType != null) 'body_type': bodyType,
     if (photoUrl != null) 'avatar_url': photoUrl,
     if (stylePreferences.isNotEmpty) 'style_vibe': stylePreferences.first,
+    if (ethnicity != null) 'ethnicity': ethnicity,
     'profile_completed': profileCompleted,
   };
 
@@ -148,21 +172,38 @@ class UserProfileModel {
     if (profileCompleted) return true;
 
     final hasGender = gender != null && gender!.trim().isNotEmpty;
+    final hasPhone = phone != null && phone!.trim().isNotEmpty;
+    final hasPhoto = photoUrl != null && photoUrl!.trim().isNotEmpty;
     final hasBodyType = bodyType != null && bodyType!.trim().isNotEmpty;
     final hasHeight = heightCm != null && heightCm! > 0;
     final hasWeight = weightKg != null && weightKg! > 0;
+    final hasMeasurements =
+        chestCm != null &&
+        chestCm! > 0 &&
+        waistCm != null &&
+        waistCm! > 0 &&
+        hipCm != null &&
+        hipCm! > 0;
     final hasSkinTone = skinTone != null && skinTone!.trim().isNotEmpty;
+    final hasEthnicity = ethnicity != null && ethnicity!.trim().isNotEmpty;
     final hasStyle = stylePreferences.isNotEmpty;
 
     return hasGender &&
+        hasPhone &&
+        hasPhoto &&
         hasBodyType &&
         hasHeight &&
         hasWeight &&
-        (hasSkinTone || hasStyle);
+        hasMeasurements &&
+        hasSkinTone &&
+        hasEthnicity &&
+        hasStyle;
   }
 
   UserProfileModel copyWith({
     String? fullName,
+    String? username,
+    String? email,
     DateTime? dateOfBirth,
     String? gender,
     String? phone,
@@ -174,16 +215,21 @@ class UserProfileModel {
     double? chestCm,
     double? waistCm,
     double? hipCm,
+    String? ethnicity,
     List<String>? stylePreferences,
     List<String>? preferredColors,
     int? budgetMin,
     int? budgetMax,
     List<String>? occasions,
     bool? profileCompleted,
+    bool? isBanned,
+    String? banReason,
   }) {
     return UserProfileModel(
       id: id,
       fullName: fullName ?? this.fullName,
+      username: username ?? this.username,
+      email: email ?? this.email,
       dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       gender: gender ?? this.gender,
       phone: phone ?? this.phone,
@@ -195,12 +241,15 @@ class UserProfileModel {
       chestCm: chestCm ?? this.chestCm,
       waistCm: waistCm ?? this.waistCm,
       hipCm: hipCm ?? this.hipCm,
+      ethnicity: ethnicity ?? this.ethnicity,
       stylePreferences: stylePreferences ?? this.stylePreferences,
       preferredColors: preferredColors ?? this.preferredColors,
       budgetMin: budgetMin ?? this.budgetMin,
       budgetMax: budgetMax ?? this.budgetMax,
       occasions: occasions ?? this.occasions,
       profileCompleted: profileCompleted ?? this.profileCompleted,
+      isBanned: isBanned ?? this.isBanned,
+      banReason: banReason ?? this.banReason,
     );
   }
 }

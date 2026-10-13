@@ -51,6 +51,7 @@ class AppTextStyles {
     fontSize: 28,
     fontWeight: FontWeight.w700,
     height: 1.1,
+    color: Color(0xFF3B82F6), // Vibrant blue as requested
   );
 
   // ─── Title ───

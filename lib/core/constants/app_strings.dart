@@ -50,6 +50,7 @@ class AppStrings {
   static const String and = ' and ';
   static const String privacyPolicy = 'Privacy Policy';
   static const String sendResetLink = 'Send Reset Link';
+  static const String sendOtpCode = 'OTP Code';
   static const String backToLogin = 'Back to Login';
   static const String checkYourEmail = 'Check Your Email';
   static const String resetEmailSent =

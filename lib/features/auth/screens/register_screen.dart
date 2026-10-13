@@ -9,8 +9,11 @@ import 'package:smartfit/core/constants/app_strings.dart';
 import 'package:smartfit/core/constants/app_text_styles.dart';
 import 'package:smartfit/core/router/app_router.dart';
 import 'package:smartfit/core/utils/validators.dart';
+import 'package:smartfit/core/widgets/clothing_pattern_background.dart';
 import 'package:smartfit/features/auth/providers/auth_provider.dart';
+import 'package:smartfit/features/auth/widgets/password_requirements.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -22,11 +25,14 @@ class RegisterScreen extends ConsumerStatefulWidget {
 class _RegisterScreenState extends ConsumerState<RegisterScreen>
     with TickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final _fullNameCtrl = TextEditingController();
   final _usernameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _otpCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
+  final _passwordFocusNode = FocusNode();
+  final _confirmPasswordFocusNode = FocusNode();
 
   // 6 individual OTP box controllers + focus nodes
   final List<TextEditingController> _otpBoxCtrls = List.generate(
@@ -60,6 +66,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
   @override
   void dispose() {
+    _fullNameCtrl.dispose();
     _usernameCtrl.dispose();
     _emailCtrl.dispose();
     _otpCtrl.dispose();
@@ -71,9 +78,28 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     for (final f in _otpFocusNodes) {
       f.dispose();
     }
+    _passwordFocusNode.dispose();
+    _confirmPasswordFocusNode.dispose();
     _fadeCtrl?.dispose();
     _resendTimer?.cancel();
     super.dispose();
+  }
+
+  void _handleBack() {
+    if (_showVerification) {
+      _fadeCtrl?.reverse().then((_) {
+        if (!mounted) return;
+        setState(() => _showVerification = false);
+        _fadeCtrl?.forward();
+      });
+      return;
+    }
+
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go(RoutePaths.login);
+    }
   }
 
   void _syncOtpFromBoxes() {
@@ -146,7 +172,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         .signUpWithEmail(
           email: enteredEmail,
           password: _passwordCtrl.text.trim(),
-          fullName: _usernameCtrl.text.trim(),
+          fullName: _fullNameCtrl.text.trim(),
+          username: _usernameCtrl.text.trim(),
           dateOfBirth: _selectedDob!,
         );
 
@@ -255,127 +282,100 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       }
     });
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Stack(
-        children: [
-          // 3 ambient orbs: pink top-left, purple right, pink bottom-left
-          Positioned(
-            top: -80,
-            left: -80,
-            child: Container(
-              width: 280,
-              height: 280,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.secondaryFixedDim.withValues(alpha: 0.25),
-                    Colors.transparent,
-                  ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _handleBack();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Stack(
+          children: [
+            // 3 ambient orbs: pink top-left, purple right, pink bottom-left
+            Positioned(
+              top: -80,
+              left: -80,
+              child: Container(
+                width: 280,
+                height: 280,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.secondaryFixedDim.withValues(alpha: 0.25),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            top: 200,
-            right: -60,
-            child: Container(
-              width: 220,
-              height: 220,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.primary.withValues(alpha: 0.18),
-                    Colors.transparent,
-                  ],
+            Positioned(
+              top: 200,
+              right: -60,
+              child: Container(
+                width: 220,
+                height: 220,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.primary.withValues(alpha: 0.18),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Positioned(
-            bottom: -100,
-            left: -60,
-            child: Container(
-              width: 300,
-              height: 300,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: RadialGradient(
-                  colors: [
-                    AppColors.secondaryFixedDim.withValues(alpha: 0.2),
-                    Colors.transparent,
-                  ],
+            Positioned(
+              bottom: -100,
+              left: -60,
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: RadialGradient(
+                    colors: [
+                      AppColors.secondaryFixedDim.withValues(alpha: 0.2),
+                      Colors.transparent,
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          // Decorative blur element behind card
-          Positioned(
-            bottom: 100,
-            right: -20,
-            child: Container(
-              width: 128,
-              height: 128,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primaryContainer.withValues(alpha: 0.6),
-              ),
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                child: const SizedBox(),
+            // Decorative blur element behind card
+            Positioned(
+              bottom: 100,
+              right: -20,
+              child: Container(
+                width: 128,
+                height: 128,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primaryContainer.withValues(alpha: 0.6),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
+                  child: const SizedBox(),
+                ),
               ),
             ),
-          ),
+            // ── Pink Clothing Icons Low-Opacity Background ──
+            const Positioned.fill(
+              child: ClothingPatternBackground(
+                opacity: 0.055,
+                color: Color(0xFFFF2E93),
+              ),
+            ),
 
-          // Back button header
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 8,
-                ),
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => context.canPop()
-                          ? context.pop()
-                          : context.go(RoutePaths.login),
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceContainer.withValues(
-                            alpha: 0.5,
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          color: AppColors.onSurface,
-                          size: 22,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+            FadeTransition(
+              opacity: _fadeAnim,
+              child: _showVerification
+                  ? _buildOtpScreen(isLoading)
+                  : _buildRegistrationForm(isLoading),
             ),
-          ),
-
-          FadeTransition(
-            opacity: _fadeAnim,
-            child: _showVerification
-                ? _buildOtpScreen(isLoading)
-                : _buildRegistrationForm(isLoading),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -581,6 +581,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 80),
         child: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -592,7 +593,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     color: AppColors.onSurface,
                   ),
                 ),
-              ),
+              ).animate().fadeIn(duration: 500.ms).slideY(begin: -0.05, curve: Curves.easeOutCubic),
               const SizedBox(height: 8),
               Center(
                 child: Text(
@@ -602,7 +603,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   ),
                   textAlign: TextAlign.center,
                 ),
-              ),
+              ).animate().fadeIn(duration: 500.ms, delay: 50.ms).slideY(begin: -0.05, curve: Curves.easeOutCubic),
               const SizedBox(height: 32),
 
               // Glass Card — rounded-[32px] per design.md
@@ -633,8 +634,29 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           label: 'FULL NAME',
                           hint: 'Enter your name',
                           icon: Icons.person_outlined,
-                          controller: _usernameCtrl,
+                          controller: _fullNameCtrl,
                           validator: Validators.fullName,
+                        ),
+                        const SizedBox(height: 20),
+                        _buildField(
+                          label: 'USERNAME',
+                          hint: 'letters, numbers, underscore',
+                          icon: Icons.alternate_email_rounded,
+                          controller: _usernameCtrl,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                          ],
+                          validator: (v) {
+                            final value = v?.trim().toLowerCase() ?? '';
+                            if (value.isEmpty) return 'Username is required';
+                            if (RegExp(r'\s').hasMatch(v ?? '')) {
+                              return 'Username cannot contain spaces';
+                            }
+                            if (!RegExp(r'^[a-z0-9_]{3,24}$').hasMatch(value)) {
+                              return 'Use 3-24 letters, numbers, or underscore';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 20),
                         _buildField(
@@ -723,8 +745,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           hint: 'At least 8 characters',
                           icon: Icons.lock_outlined,
                           controller: _passwordCtrl,
+                          focusNode: _passwordFocusNode,
                           validator: Validators.password,
                           obscureText: _obscurePassword,
+                          onChanged: (_) => setState(() {}),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscurePassword
@@ -744,9 +768,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           hint: 'Re-enter password',
                           icon: Icons.lock_outline,
                           controller: _confirmPasswordCtrl,
+                          focusNode: _confirmPasswordFocusNode,
                           validator: (v) =>
                               Validators.confirmPassword(v, _passwordCtrl.text),
                           obscureText: _obscureConfirm,
+                          onChanged: (_) => setState(() {}),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _obscureConfirm
@@ -760,6 +786,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             ),
                           ),
                         ),
+                        if (_passwordCtrl.text.isNotEmpty ||
+                            _confirmPasswordCtrl.text.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 12),
+                            child: PasswordRequirementsList(
+                              password: _passwordCtrl.text,
+                              confirmPassword: _confirmPasswordCtrl.text,
+                            ),
+                          ),
                         const SizedBox(height: 32),
 
                         // CTA — hot pink (secondary-container) per design.md
@@ -822,12 +857,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                     ],
                                   ),
                           ),
-                        ),
+                        ).animate().scale(begin: const Offset(0.96, 0.96), duration: 300.ms, curve: Curves.easeOutBack),
                       ],
                     ),
                   ),
                 ),
-              ),
+              )
+                  .animate()
+                  .fadeIn(duration: 600.ms, delay: 100.ms)
+                  .slideY(begin: 0.05, curve: Curves.easeOutCubic),
               const SizedBox(height: 32),
 
               // Footer — "Already have an account? Log In"
@@ -855,7 +893,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                     ),
                   ),
                 ),
-              ),
+              ).animate().fadeIn(duration: 500.ms, delay: 200.ms),
               const SizedBox(height: 40),
             ],
           ),
@@ -873,6 +911,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     TextInputType? keyboardType,
     bool obscureText = false,
     Widget? suffixIcon,
+    List<TextInputFormatter>? inputFormatters,
+    FocusNode? focusNode,
+    ValueChanged<String>? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -896,9 +937,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
           ),
           child: TextFormField(
             controller: controller,
+            focusNode: focusNode,
             obscureText: obscureText,
             keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
             validator: validator,
+            onChanged: onChanged,
             style: AppTextStyles.bodyLg.copyWith(color: AppColors.onSurface),
             decoration: InputDecoration(
               hintText: hint,
@@ -907,12 +951,34 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
               ),
               prefixIcon: Icon(icon, color: AppColors.outline, size: 22),
               suffixIcon: suffixIcon,
-              filled: false,
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
+              filled: true,
+              fillColor: AppColors.secondaryFixed.withValues(alpha: 0.16),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: const BorderSide(
+                  color: AppColors.secondaryContainer,
+                  width: 2,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: const BorderSide(color: AppColors.error),
+              ),
+              focusedErrorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(24),
+                borderSide: const BorderSide(
+                  color: AppColors.secondaryContainer,
+                  width: 2,
+                ),
+              ),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 16,
                 horizontal: 16,

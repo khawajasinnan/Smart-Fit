@@ -38,22 +38,22 @@ class AppColors {
   static const Color onTertiaryFixedVariant = Color(0xFF673D00);
 
   // ─── Surface & Background ───
-  static const Color background = Color(0xFFFEF7FF);
+  static const Color background = Color(0xFFFBF9F6); // Elegant dull white / warm eggshell
   static const Color onBackground = Color(0xFF1D1A23);
-  static const Color surface = Color(0xFFFEF7FF);
+  static const Color surface = Color(0xFFFBF9F6);
   static const Color onSurface = Color(0xFF1D1A23);
-  static const Color surfaceDim = Color(0xFFDED7E4);
-  static const Color surfaceBright = Color(0xFFFEF7FF);
-  static const Color surfaceVariant = Color(0xFFE7E0ED);
+  static const Color surfaceDim = Color(0xFFECE5E9);
+  static const Color surfaceBright = Color(0xFFFBF9F6);
+  static const Color surfaceVariant = Color(0xFFF6EBF0); // Dull white with pinkish undertone
   static const Color onSurfaceVariant = Color(0xFF494454);
   static const Color surfaceTint = Color(0xFF6D3BD7);
 
-  // ─── Surface Containers (Elevation Layers) ───
+  // ─── Surface Containers (Elevation Layers with Soft Pink glow) ───
   static const Color surfaceContainerLowest = Color(0xFFFFFFFF);
-  static const Color surfaceContainerLow = Color(0xFFF8F1FE);
-  static const Color surfaceContainer = Color(0xFFF3EBF8);
-  static const Color surfaceContainerHigh = Color(0xFFEDE5F3);
-  static const Color surfaceContainerHighest = Color(0xFFE7E0ED);
+  static const Color surfaceContainerLow = Color(0xFFFFF2F6); // soft premium pink
+  static const Color surfaceContainer = Color(0xFFFFF0F5);    // beautiful soft rose pink
+  static const Color surfaceContainerHigh = Color(0xFFFFEBF2);
+  static const Color surfaceContainerHighest = Color(0xFFFFE5F0);
 
   // ─── Inverse & Special ───
   static const Color inverseSurface = Color(0xFF322F39);
@@ -61,7 +61,7 @@ class AppColors {
 
   // ─── Outline ───
   static const Color outline = Color(0xFF7B7486);
-  static const Color outlineVariant = Color(0xFFCBC3D7);
+  static const Color outlineVariant = Color(0xFFEAD5DF);
 
   // ─── Error ───
   static const Color error = Color(0xFFBA1A1A);

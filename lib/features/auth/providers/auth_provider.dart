@@ -46,6 +46,19 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
     _init();
   }
 
+  Future<bool> _rejectIfRestricted(String userId) async {
+    final restriction = await _repository.userRestriction(userId);
+    if (restriction != null) {
+      await _repository.signOut();
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: restriction['message']?.toString(),
+      );
+      return true;
+    }
+    return false;
+  }
+
   void _init() {
     final user = _repository.currentUser;
     if (user != null) {
@@ -53,6 +66,7 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
         status: AuthStatus.authenticated,
         user: UserModel.fromSupabaseUser(user),
       );
+      Future.microtask(() => _rejectIfRestricted(user.id));
     } else {
       state = const AuthStateModel(status: AuthStatus.unauthenticated);
     }
@@ -64,9 +78,10 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
 
       if (event == AuthChangeEvent.signedIn && session?.user != null) {
         state = AuthStateModel(
-            status: AuthStatus.authenticated,
-            user: UserModel.fromSupabaseUser(session!.user),
-          );
+          status: AuthStatus.authenticated,
+          user: UserModel.fromSupabaseUser(session!.user),
+        );
+        Future.microtask(() => _rejectIfRestricted(session.user.id));
       } else if (event == AuthChangeEvent.signedOut) {
         state = const AuthStateModel(status: AuthStatus.unauthenticated);
       } else if (event == AuthChangeEvent.tokenRefreshed &&
@@ -84,6 +99,7 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
     required String email,
     required String password,
     required String fullName,
+    required String username,
     required DateTime dateOfBirth,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
@@ -92,12 +108,16 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
         email: email,
         password: password,
         fullName: fullName,
+        username: username,
         dateOfBirth: dateOfBirth,
       );
 
       // If Supabase returns no user object, treat as failure
       if (response.user == null) {
-        state = state.copyWith(status: AuthStatus.error, errorMessage: 'Registration failed');
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Registration failed',
+        );
         return SignUpResult.failed;
       }
 
@@ -105,7 +125,11 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
       try {
         final identities = response.user?.identities;
         if (identities != null && identities.isEmpty) {
-          state = state.copyWith(status: AuthStatus.error, errorMessage: 'This email is already registered. Please login instead.');
+          state = state.copyWith(
+            status: AuthStatus.error,
+            errorMessage:
+                'This email is already registered. Please login instead.',
+          );
           return SignUpResult.alreadyRegistered;
         }
       } catch (_) {}
@@ -115,22 +139,30 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
       return SignUpResult.success;
     } on AuthException catch (e) {
       final msg = e.message.toLowerCase();
-      if (msg.contains('already registered') || msg.contains('user already registered') || msg.contains('email already exists') || msg.contains('already exists')) {
-        state = state.copyWith(status: AuthStatus.error, errorMessage: 'This email is already registered. Please login instead.');
+      if (msg.contains('already registered') ||
+          msg.contains('user already registered') ||
+          msg.contains('email already exists') ||
+          msg.contains('already exists')) {
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage:
+              'This email is already registered. Please login instead.',
+        );
         return SignUpResult.alreadyRegistered;
       }
       state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
       return SignUpResult.failed;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
       return SignUpResult.failed;
     }
   }
 
   /// Send OTP
-  Future<bool> sendRegisterOtp({
-    required String email,
-  }) async {
+  Future<bool> sendRegisterOtp({required String email}) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
       await _repository.sendRegisterOtp(email);
@@ -140,15 +172,16 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
       state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
       return false;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
       return false;
     }
   }
 
   /// Send password reset email only for forgot password flow.
-  Future<bool> sendPasswordResetOtp({
-    required String email,
-  }) async {
+  Future<bool> sendPasswordResetOtp({required String email}) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
       await _repository.sendPasswordResetOtp(email);
@@ -158,7 +191,10 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
       state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
       return false;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
       return false;
     }
   }
@@ -170,23 +206,38 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      final response = await _repository.verifyRecoveryOtp(email: email, otp: otp);
+      final response = await _repository.verifyRecoveryOtp(
+        email: email,
+        otp: otp,
+      );
       if (response.user != null) {
         state = state.copyWith(status: AuthStatus.unauthenticated);
         return true;
       }
-      state = state.copyWith(status: AuthStatus.error, errorMessage: 'Invalid or expired reset code.');
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Invalid or expired reset code.',
+      );
       return false;
     } on AuthException catch (e) {
       final low = e.message.toLowerCase();
       if (low.contains('invalid') || low.contains('expired')) {
-        state = state.copyWith(status: AuthStatus.error, errorMessage: 'Invalid or expired reset code.');
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Invalid or expired reset code.',
+        );
       } else {
-        state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: e.message,
+        );
       }
       return false;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
       return false;
     }
   }
@@ -199,25 +250,40 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      final response = await _repository.verifyRecoveryOtp(email: email, otp: otp);
+      final response = await _repository.verifyRecoveryOtp(
+        email: email,
+        otp: otp,
+      );
       if (response.user != null) {
         await _repository.resetUserPassword(newPassword);
         await _repository.signOut();
         state = const AuthStateModel(status: AuthStatus.unauthenticated);
         return true;
       }
-      state = state.copyWith(status: AuthStatus.error, errorMessage: 'Invalid or expired reset code.');
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Invalid or expired reset code.',
+      );
       return false;
     } on AuthException catch (e) {
       final low = e.message.toLowerCase();
       if (low.contains('invalid') || low.contains('expired')) {
-        state = state.copyWith(status: AuthStatus.error, errorMessage: 'Invalid or expired reset code.');
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: 'Invalid or expired reset code.',
+        );
       } else {
-        state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
+        state = state.copyWith(
+          status: AuthStatus.error,
+          errorMessage: e.message,
+        );
       }
       return false;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
       return false;
     }
   }
@@ -232,7 +298,10 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      final response = await _repository.verifyRegisterOtp(email: email, otp: otp);
+      final response = await _repository.verifyRegisterOtp(
+        email: email,
+        otp: otp,
+      );
       if (response.user != null) {
         // For signup verification: do NOT set password here.
         // Only update metadata (profile creation). Password should be set via signUp flow.
@@ -247,29 +316,38 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
         );
         return true;
       }
-      state = state.copyWith(status: AuthStatus.unauthenticated, errorMessage: 'Verification failed');
+      state = state.copyWith(
+        status: AuthStatus.unauthenticated,
+        errorMessage: 'Verification failed',
+      );
       return false;
     } on AuthException catch (e) {
       state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
       return false;
     } catch (e) {
-      state = state.copyWith(status: AuthStatus.error, errorMessage: e.toString());
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
       return false;
     }
   }
 
-  /// Sign in with email
-  Future<bool> signInWithEmail({
-    required String email,
+  /// Sign in with email or username
+  Future<bool> signInWithIdentifier({
+    required String identifier,
     required String password,
   }) async {
     state = state.copyWith(status: AuthStatus.loading);
     try {
-      final response = await _repository.signInWithEmail(
-        email: email,
+      final response = await _repository.signInWithIdentifier(
+        identifier: identifier,
         password: password,
       );
       if (response.user != null) {
+        if (await _rejectIfRestricted(response.user!.id)) {
+          return false;
+        }
         state = AuthStateModel(
           status: AuthStatus.authenticated,
           user: UserModel.fromSupabaseUser(response.user!),
@@ -282,10 +360,7 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
       );
       return false;
     } on AuthException catch (e) {
-      state = state.copyWith(
-        status: AuthStatus.error,
-        errorMessage: e.message,
-      );
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
       return false;
     } catch (e) {
       state = state.copyWith(
@@ -302,6 +377,9 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
     try {
       final response = await _repository.signInWithGoogle();
       if (response.user != null) {
+        if (await _rejectIfRestricted(response.user!.id)) {
+          return false;
+        }
         state = AuthStateModel(
           status: AuthStatus.authenticated,
           user: UserModel.fromSupabaseUser(response.user!),
@@ -344,6 +422,39 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
     state = const AuthStateModel(status: AuthStatus.unauthenticated);
   }
 
+  Future<bool> updateAccountName(String fullName) async {
+    final trimmed = fullName.trim();
+    if (trimmed.length < 2) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: 'Please enter your full name.',
+      );
+      return false;
+    }
+
+    state = state.copyWith(status: AuthStatus.loading);
+    try {
+      await _repository.updateAccountName(trimmed);
+      final user = _repository.currentUser;
+      state = AuthStateModel(
+        status: user != null
+            ? AuthStatus.authenticated
+            : AuthStatus.unauthenticated,
+        user: user != null ? UserModel.fromSupabaseUser(user) : null,
+      );
+      return true;
+    } on AuthException catch (e) {
+      state = state.copyWith(status: AuthStatus.error, errorMessage: e.message);
+      return false;
+    } catch (e) {
+      state = state.copyWith(
+        status: AuthStatus.error,
+        errorMessage: e.toString(),
+      );
+      return false;
+    }
+  }
+
   /// Clear error
   void clearError() {
     state = state.copyWith(
@@ -358,6 +469,6 @@ class AuthNotifier extends StateNotifier<AuthStateModel> {
 /// Auth notifier provider
 final authNotifierProvider =
     StateNotifierProvider<AuthNotifier, AuthStateModel>((ref) {
-  final repository = ref.watch(authRepositoryProvider);
-  return AuthNotifier(repository);
-});
+      final repository = ref.watch(authRepositoryProvider);
+      return AuthNotifier(repository);
+    });
