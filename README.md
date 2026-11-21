@@ -1,93 +1,50 @@
 # SmartFit
 
-SmartFit is a Flutter and Supabase mobile app for AI-assisted fashion recommendations in Pakistan. It supports email authentication, mandatory profile setup, AI stylist chat, photo-based outfit discussion, voice input, and profile-aware styling suggestions.
+SmartFit is an AI fashion assistant for the Pakistani market: a Flutter app with a FastAPI
+backend and Supabase. Shoppers set up a profile (body shape, measurements, usual size, skin tone
+and undertone, culture), chat with the AI stylist Zayn, get products from Pakistani stores in
+their size, try clothes on virtually, preview hairstyles, score a look and keep a wardrobe.
+Admins manage users, feedback and the product catalog in a web panel.
 
-## Current Stack
+**Install and run it: see [INSTALL.md](INSTALL.md).**
 
-- Flutter + Dart
-- Riverpod for state management
-- GoRouter for navigation
-- Supabase Auth, PostgreSQL, and Storage
-- Gemini REST API for AI stylist responses
-- Camera, image picker, and speech-to-text for chat/profile inputs
-
-## Project Architecture
+## What is where
 
 ```text
-lib/
-├── app.dart
-├── main.dart
-├── core/
-│   ├── constants/      App colors, strings, text styles, API endpoints
-│   ├── providers/      Shared app providers
-│   ├── router/         GoRouter routes
-│   ├── theme/          Light and dark theme setup
-│   ├── utils/          Validation helpers
-│   └── widgets/        Shared UI widgets
-└── features/
-    ├── auth/           Login, registration, password recovery, auth provider
-    ├── chat/           AI stylist chat, image upload, voice input, history
-    ├── home/           Home dashboard
-    ├── profile/        Profile setup, profile gate, profile repository
-    └── settings/       Settings and logout
+frontend/      Flutter app (Android, iOS, web)
+backend/       FastAPI: gateway (port 8000) + 7 services
+  gateway/       the only address the app and the admin panel talk to
+  services/      cv_analysis, recommendation, scraper, chat_orchestrator,
+                 tryon, hairstyle, scoring
+  shared/        code used by several services (sizes, colours, cultures ...)
+  scripts/       model downloads, catalog and training tools
+  tests/         pytest suite
+admin-panel/   React + Vite admin panel
+e2e/           Playwright end-to-end tests of the whole app
+k8s/, docker-compose.yml   deployment manifests
+supabase/      Supabase CLI config
 ```
 
-Platform folders (`android/`, `ios/`, `web/`, `linux/`, `macos/`, `windows/`) are standard Flutter build targets and should stay in the project.
+## Stack
 
-## Important Files
+- Flutter + Dart, Riverpod, go_router
+- FastAPI + Python 3.11, MediaPipe, FashionCLIP, LightGBM
+- Supabase (Auth, PostgreSQL, Storage)
+- Gemini for the stylist chat
+- Modal GPUs for the virtual try-on (IDM-VTON) and hairstyle previews
 
-- `.gitignore` is located at `/home/sinnan/Desktop/Smart-Fit/smartfit/.gitignore`
-- Supabase schema setup: `supabase_setup.sql`
-- Project guide and roadmap: `claude.md`
-- Design references: `design.md`, `stitch_designs/`, `stitch_screens/`
-
-## Setup
-
-1. Install Flutter and run:
+## Checks
 
 ```bash
-flutter pub get
+cd frontend && flutter analyze && flutter test
+cd backend && .venv-cpu\Scripts\python.exe -m ruff check . && .venv-cpu\Scripts\python.exe -m pytest -q
+cd admin-panel && npm test
 ```
 
-2. Configure Supabase values in:
-
-```text
-lib/core/constants/api_endpoints.dart
-```
-
-3. Apply the Supabase schema from:
-
-```text
-supabase_setup.sql
-```
-
-4. Run the app:
-
-```bash
-flutter run
-```
-
-5. Backend CV models (once, from `backend/` in `.venv-cpu`; needs `pip install onnx` for the export):
-
-```bash
-python scripts/download_cv_models.py
-```
-
-This fetches the MediaPipe face landmarker and the OpenPose body model (CMU
-weights: non-commercial/academic licence), checks their SHA-256, and exports
-OpenPose to ONNX (~200 MB, gitignored). Without it the CV service still runs;
-the detailed scan simply skips the face mesh / OpenPose.
-
-## Verification
-
-Use these commands before pushing changes:
-
-```bash
-flutter analyze
-flutter test
-```
+GitHub Actions runs the Flutter and backend checks on every push.
 
 ## Notes
 
-- Do not expose Supabase service-role keys in Flutter.
-- Keep profile completion enforced before giving users access to main app features.
+- Never put the Supabase service key in the app or the admin panel; it belongs in the backend `.env` only.
+- The datasets used for training and evaluation (VITON-HD, DressCode, CelebAMask-HQ) are for
+  non-commercial research only and are not in this repository.
