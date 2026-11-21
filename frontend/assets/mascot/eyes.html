@@ -1,0 +1,313 @@
+<!doctype html>
+<!--
+  "Peekers": SmartFit's home-screen buddy (spec §23.16). Just a pair of
+  glossy cartoon eyes peeking over the edge of the home header. They blink,
+  glance around, follow the user's taps and react. three.js r149 (MIT),
+  bundled next to this file; no network, no third-party model.
+
+  The app posts:
+    {eyes: "look", x, y, seq}     look toward a point (-1..1, y up), then wander again
+    {eyes: "react", name, seq}    happy | surprised | wink | love | sleepy, and the big
+                                  "solid" actions: jump | spin | dizzy | roll | cross |
+                                  laugh | peek | star
+    {eyes: "reduced", value}      gentle motion only (no big actions)
+    {eyes: "theme", dark}         dark theme: lime irises, pink lids (black/pink/green)
+  On their own the eyes do a random solid action every 7-13 s.
+    {mascot: "pause" | "resume"}
+  The page answers "ready" / "nowebgl" (MascotChannel on mobile, {mascotEvent} on the web).
+  Still renders: ?still=1&react=happy&t=1.0[&bg=f6f3ff][&dark=1]
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+</style>
+</head>
+<body>
+<script src="three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var params = new URLSearchParams(location.search);
+  var STILL = params.get("still") === "1";
+
+  function notify(msg) {
+    try { if (window.MascotChannel) window.MascotChannel.postMessage(msg); } catch (e) {}
+    try { if (window.parent !== window) window.parent.postMessage({ mascotEvent: msg }, "*"); } catch (e) {}
+  }
+  var probe = document.createElement("canvas");
+  var gl = probe.getContext("webgl") || probe.getContext("experimental-webgl");
+  if (!gl || typeof THREE === "undefined") { notify("nowebgl"); return; }
+
+  THREE.ColorManagement.legacyMode = false;
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: STILL });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  if (params.get("bg")) renderer.setClearColor(parseInt(params.get("bg"), 16), 1);
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  document.body.appendChild(renderer.domElement);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(24, 2, 0.1, 100);
+  camera.position.set(0, 0.35, 10); camera.lookAt(0, 0.35, 0);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a948b, 1.0));
+  var key = new THREE.DirectionalLight(0xffffff, 0.9); key.position.set(2, 4, 6); scene.add(key);
+
+  var gradTex = new THREE.DataTexture(new Uint8Array([170, 170, 170, 255, 220, 220, 220, 255, 255, 255, 255, 255]), 3, 1);
+  gradTex.minFilter = THREE.NearestFilter; gradTex.magFilter = THREE.NearestFilter; gradTex.needsUpdate = true;
+  function toon(c) { return new THREE.MeshToonMaterial({ color: c, gradientMap: gradTex }); }
+  function basic(c, o) { return new THREE.MeshBasicMaterial(Object.assign({ color: c }, o || {})); }
+
+  var LIGHT = { iris: 0x0a7d3b, irisRing: 0x39ff5a, pupil: 0x0a0c0a, lid: 0x3b433d, brow: 0x252b26 };
+  var DARK = { iris: 0x39ff5a, irisRing: 0xb8ffc6, pupil: 0x050505, lid: 0x5a6a5c, brow: 0x9aa39b };
+  var C = Object.assign({ white: 0xffffff }, params.get("dark") === "1" ? DARK : LIGHT);
+  var R = 1.05;   // eyeball radius
+  var root = new THREE.Group(); scene.add(root);
+
+  function makeEye(x, side) {
+    var g = new THREE.Group(); g.position.set(x, 0, 0); root.add(g);
+    var ball = new THREE.Mesh(new THREE.SphereGeometry(R, 48, 36), toon(C.white)); ball.scale.set(1, 1.08, 0.9); g.add(ball);
+    var look = new THREE.Group(); g.add(look);        // rotates to aim the iris
+    var ring = new THREE.Mesh(new THREE.CircleGeometry(0.5, 40), basic(C.irisRing)); ring.position.z = R * 0.905; look.add(ring);
+    var iris = new THREE.Mesh(new THREE.CircleGeometry(0.43, 40), basic(C.iris)); iris.position.z = R * 0.91; look.add(iris);
+    var pupil = new THREE.Mesh(new THREE.CircleGeometry(0.22, 32), basic(C.pupil)); pupil.position.z = R * 0.915; look.add(pupil);
+    var shine1 = new THREE.Mesh(new THREE.CircleGeometry(0.11, 20), basic(C.white)); shine1.position.set(0.16, 0.17, R * 0.92); look.add(shine1);
+    var shine2 = new THREE.Mesh(new THREE.CircleGeometry(0.05, 16), basic(C.white)); shine2.position.set(-0.13, -0.12, R * 0.92); look.add(shine2);
+    // upper lid (hidden behind when open) and lower lid (rises for happy "^^")
+    var upper = new THREE.Mesh(new THREE.SphereGeometry(R * 1.07, 40, 20, 0, Math.PI * 2, 0, Math.PI / 2), toon(C.lid));
+    upper.scale.set(1, 1.08, 0.93); g.add(upper);
+    var lower = new THREE.Mesh(new THREE.SphereGeometry(R * 1.065, 40, 20, 0, Math.PI * 2, Math.PI / 2, Math.PI / 2), toon(C.lid));
+    lower.scale.set(1.01, 1.08, 1.02);  // deep enough to cover the iris when it rises
+    // lash line drawn across a closed eye
+    var lash = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.06, 8, 32, Math.PI), basic(C.brow, { transparent: true, opacity: 0 }));
+    lash.rotation.z = Math.PI; lash.position.set(0, 0.3, R * 1.02); g.add(lash); g.add(lower);
+    var brow = new THREE.Mesh(new THREE.CapsuleGeometry(0.11, 0.62, 6, 12), toon(C.brow));
+    brow.rotation.z = Math.PI / 2; var bg = new THREE.Group(); bg.add(brow); bg.position.set(0, 1.45, 0.4); g.add(bg);
+    return { g: g, look: look, upper: upper, lower: lower, brow: bg, browMesh: brow, side: side, pupil: pupil, lash: lash,
+             iris: iris, ring: ring };
+  }
+  var eyes = [makeEye(-1.18, -1), makeEye(1.18, 1)];
+
+  // little heart sprite for "love"
+  function spriteTex(draw) { var c = document.createElement("canvas"); c.width = c.height = 128; draw(c.getContext("2d"));
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t; }
+  var heartTex = spriteTex(function (x) { x.fillStyle = "#ff4fa3"; x.beginPath(); x.moveTo(64, 112);
+    x.bezierCurveTo(8, 72, 8, 20, 40, 20); x.bezierCurveTo(56, 20, 64, 34, 64, 40);
+    x.bezierCurveTo(64, 34, 72, 20, 88, 20); x.bezierCurveTo(120, 20, 120, 72, 64, 112); x.fill(); });
+  var zTex = spriteTex(function (x) { x.font = "bold 90px Arial"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.lineWidth = 10; x.strokeStyle = "#fff"; x.strokeText("z", 64, 64); x.fillStyle = "#0a7d3b"; x.fillText("z", 64, 64); });
+  var hearts = [-1.18, 1.18].map(function (x) {
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: heartTex, transparent: true, opacity: 0, depthWrite: false }));
+    s.position.set(x, 0, 1.2); s.scale.set(0.95, 0.95, 1); scene.add(s); return s; });
+  // sparkles for "star": alternating pink and lime four-point stars
+  function starTex(color) { return spriteTex(function (x) { x.fillStyle = color; x.beginPath();
+    for (var i = 0; i < 8; i++) { var a = i * Math.PI / 4, r = i % 2 ? 18 : 60; x.lineTo(64 + Math.cos(a) * r, 64 + Math.sin(a) * r); }
+    x.closePath(); x.fill(); }); }
+  var starTexA = starTex("#39ff5a"), starTexB = starTex("#f6c945");
+  var stars = [];
+  for (var si = 0; si < 10; si++) {
+    var st = new THREE.Sprite(new THREE.SpriteMaterial({ map: si % 2 ? starTexB : starTexA, transparent: true, opacity: 0, depthWrite: false }));
+    st.userData.angle = si / 10 * Math.PI * 2 + 0.3; st.scale.set(0.5, 0.5, 1); scene.add(st); stars.push(st);
+  }
+
+  function setTheme(dark) {
+    var P = dark ? DARK : LIGHT;
+    eyes.forEach(function (e) {
+      e.iris.material.color.setHex(P.iris); e.ring.material.color.setHex(P.irisRing); e.pupil.material.color.setHex(P.pupil);
+      e.upper.material.color.setHex(P.lid); e.lower.material.color.setHex(P.lid);
+      e.browMesh.material.color.setHex(P.brow); e.lash.material.color.setHex(P.brow);
+    });
+  }
+
+  var zz = new THREE.Sprite(new THREE.SpriteMaterial({ map: zTex, transparent: true, opacity: 0, depthWrite: false }));
+  zz.position.set(2.5, 1.4, 1); zz.scale.set(0.6, 0.6, 1); scene.add(zz);
+
+  // ── state ────────────────────────────────────────────────────────────────
+  var clock = 0, reduced = false, running = true, last = performance.now(), acc = 0;
+  var gaze = { x: 0, y: 0 }, gazeTarget = { x: 0, y: 0 }, holdUntil = 0, nextWander = 1.5;
+  var nextBlink = 2, blinkT = -1, doubleBlink = false;
+  var react = "none", reactUntil = 0, reactStart = 0;
+  // how long each reaction lasts (s); the "solid" ones are big, whole-body actions
+  var DURATION = { sleepy: 4, jump: 1.0, spin: 1.1, dizzy: 2.2, roll: 1.3, cross: 1.5, laugh: 1.5, peek: 1.7, star: 1.9 };
+  var SOLID = ["jump", "spin", "dizzy", "roll", "cross", "laugh", "peek", "star"];
+  var nextAuto = 6 + Math.random() * 4, lastAuto = "";
+  var pop = STILL ? 1 : 0;   // pops up from below on load
+
+  function look(x, y) {
+    gazeTarget.x = Math.max(-1, Math.min(1, x)); gazeTarget.y = Math.max(-1, Math.min(1, y));
+    holdUntil = clock + 2.5;
+  }
+  function doReact(name) {
+    if (reduced && SOLID.indexOf(name) >= 0) name = "happy";   // reduced motion: no big moves
+    react = name; reactStart = clock; reactUntil = clock + (DURATION[name] || 1.8);
+    nextAuto = Math.max(nextAuto, reactUntil + 5 + Math.random() * 4);
+    if (name === "surprised") { holdUntil = clock + 1; gazeTarget.x = 0; gazeTarget.y = 0.1; }
+  }
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function clamp01(t) { return Math.max(0, Math.min(1, t)); }
+  function easeInOut(t) { t = clamp01(t); return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
+  function easeOutBack(t) { t = clamp01(t); var c = 1.9; return 1 + (c + 1) * Math.pow(t - 1, 3) + c * Math.pow(t - 1, 2); }
+
+  function update(dt) {
+    clock += dt;
+    var motion = reduced ? 0.3 : 1, k = 1 - Math.pow(0.002, dt);
+    if (clock > reactUntil) react = "none";
+    // on their own: a random solid action every 7-13 s (never the same twice in a row)
+    if (!reduced && !STILL && react === "none" && clock > nextAuto) {
+      var pick; do { pick = SOLID[Math.floor(Math.random() * SOLID.length)]; } while (pick === lastAuto);
+      lastAuto = pick; doReact(pick); nextAuto = clock + 7 + Math.random() * 6;
+    }
+    pop = Math.min(1, pop + dt * 1.6);
+    var popEase = 1 - Math.pow(1 - pop, 3);
+
+    // wander when not following a tap
+    if (clock > holdUntil && clock > nextWander) {
+      gazeTarget.x = (Math.random() * 2 - 1) * 0.8; gazeTarget.y = (Math.random() * 2 - 1) * 0.5;
+      nextWander = clock + 1.4 + Math.random() * 2.2;
+    }
+    var gk = 1 - Math.pow(0.0005, dt);   // saccade-like quick moves
+    gaze.x = lerp(gaze.x, gazeTarget.x, gk); gaze.y = lerp(gaze.y, gazeTarget.y, gk);
+
+    // blink (sometimes twice)
+    if (clock > nextBlink && blinkT < 0) { blinkT = 0; doubleBlink = Math.random() < 0.25; }
+    var blink = 0;
+    if (blinkT >= 0) {
+      blinkT += dt; var len = doubleBlink ? 0.42 : 0.17, ph = blinkT / 0.17;
+      blink = Math.sin(Math.min(1, ph % 1) * Math.PI) * (ph < (doubleBlink ? 2.4 : 1) ? 1 : 0);
+      if (blinkT > len) { blinkT = -1; nextBlink = clock + 2.2 + Math.random() * 3.5; }
+    }
+
+    var rt = clock - reactStart;
+    var happy = react === "happy" || react === "love" ? Math.min(1, rt * 6) : 0;
+    var surprised = react === "surprised" ? Math.min(1, rt * 8) : 0;
+    var sleepy = react === "sleepy" ? Math.min(1, rt * 2) : 0;
+    var lov = react === "love" ? Math.min(1, rt * 5) : 0;
+
+    // ── solid actions ──
+    var actY = 0, actX = 0, actRot = 0, sqX = 1, sqY = 1, eyeOff = [0, 0], eyeOffY = 0, lidShut = 0;
+    if (react === "jump") {            // crouch, hop with a stretch, land with a squash
+      var j = rt / 1.0;
+      if (j < 0.15) { var c = Math.sin(j / 0.15 * Math.PI); sqY = 1 - 0.18 * c; sqX = 1 + 0.12 * c; }
+      else if (j < 0.75) { var air = (j - 0.15) / 0.6; actY = Math.sin(air * Math.PI) * 1.05; sqY = 1 + 0.12 * Math.sin(air * Math.PI); sqX = 1 - 0.06 * Math.sin(air * Math.PI); happy = Math.max(happy, Math.sin(air * Math.PI)); }
+      else { var l = (j - 0.75) / 0.25; var c2 = Math.sin(l * Math.PI); sqY = 1 - 0.15 * c2; sqX = 1 + 0.1 * c2; }
+    } else if (react === "spin") {     // a full cartwheel
+      actRot = -easeInOut(rt / 0.95) * Math.PI * 2; actY = Math.sin(clamp01(rt / 0.95) * Math.PI) * 0.35;
+    } else if (react === "dizzy") {    // pupils whirl in opposite circles, the head wobbles
+      var w = rt * 11, fade = clamp01((2.2 - rt) / 0.4);
+      eyeOff = [Math.cos(w) * 0.85 * fade, Math.cos(-w + 1) * 0.85 * fade]; eyeOffY = Math.sin(w) * 0.6 * fade;
+      actRot = Math.sin(rt * 7) * 0.16 * fade; actX = Math.sin(rt * 3.5) * 0.15 * fade;
+    } else if (react === "roll") {     // a sassy eye-roll over the top, then an unimpressed look
+      var rp = clamp01(rt / 0.85), a = Math.PI * (1 - easeInOut(rp));
+      eyeOff = [Math.cos(a) * 0.9, Math.cos(a) * 0.9]; eyeOffY = Math.sin(a) * 0.85;
+      if (rt > 0.85) { lidShut = 0.4; eyeOff = [0.5, 0.5]; eyeOffY = -0.1; }
+    } else if (react === "cross") {    // cross-eyed with a little shake
+      var cp = clamp01(rt / 0.25) * clamp01((1.5 - rt) / 0.25);
+      eyeOff = [0.95 * cp, -0.95 * cp]; eyeOffY = -0.15 * cp; actX = Math.sin(rt * 26) * 0.04 * cp;
+    } else if (react === "laugh") {    // shaking with laughter, eyes squeezed happy
+      var lp = clamp01((1.5 - rt) / 0.3);
+      happy = Math.max(happy, lp); actX = Math.sin(rt * 32) * 0.12 * lp; actY = Math.abs(Math.sin(rt * 14)) * 0.22 * lp;
+    } else if (react === "peek") {     // duck out of sight, then pop back up and look around
+      if (rt < 0.35) actY = -3 * easeInOut(rt / 0.35);
+      else if (rt < 0.75) actY = -3;
+      else actY = lerp(-3, 0, easeOutBack((rt - 0.75) / 0.5));
+      if (rt > 1.0) { var g2 = Math.sin((rt - 1.0) * 9); eyeOff = [g2 * 0.8, g2 * 0.8]; }
+      surprised = Math.max(surprised, rt > 0.9 && rt < 1.4 ? 1 : 0);
+    } else if (react === "star") {     // star-struck: big shiny pupils and a burst of sparkles
+      happy = Math.max(happy, Math.min(1, rt * 5)) * 0.6;
+    }
+    var starP = react === "star" ? clamp01(rt / 1.9) : 1;
+    stars.forEach(function (st, i) {
+      var d = 0.6 + easeInOut(starP) * 2.4, a2 = st.userData.angle + starP * 1.2;
+      st.position.set(Math.cos(a2) * d * 1.3, 0.2 + Math.sin(a2) * d * 0.8, 1.5);
+      st.material.opacity = react === "star" ? Math.min(1, Math.sin(starP * Math.PI) * 1.6) : 0;
+      st.material.rotation = clock * (i % 2 ? 3 : -3);
+      var sz = 0.75 + 0.3 * Math.sin(clock * 8 + i); st.scale.set(sz, sz, 1);
+    });
+
+    // peek: rise from below, gentle bob
+    root.position.y = lerp(-2.9, -0.5, popEase) + Math.sin(clock * 1.6) * 0.06 * motion + surprised * 0.25 - sleepy * 0.25 + actY;
+    root.position.x = actX;
+    root.rotation.z = Math.sin(clock * 0.8) * 0.03 * motion + actRot;
+    root.scale.set(sqX, sqY, 1);
+
+    eyes.forEach(function (e) {
+      var ox = eyeOff[e.side < 0 ? 0 : 1];
+      e.look.rotation.y = (gaze.x + ox) * 0.42; e.look.rotation.x = -(gaze.y + eyeOffY) * 0.3;
+      var sc = 1 + surprised * 0.12; e.g.scale.set(sc, sc, sc);
+      e.pupil.scale.setScalar(1 - surprised * 0.35 + lov * 0.2 + (react === "star" ? 0.3 : 0) - (react === "dizzy" ? 0.15 : 0));
+      var wink = react === "wink" && e.side < 0 ? Math.min(1, rt * 7) * (rt < 1.2 ? 1 : 0) : 0;
+      var closed = Math.min(1, blink + wink + sleepy * 0.55 + lidShut);
+      // upper lid: rotated back (hidden) when open, over the front when closed
+      e.upper.rotation.x = closed < 0.5 ? lerp(-1.9, -0.5, closed / 0.5) : lerp(-0.5, 1.2, (closed - 0.5) / 0.5);
+      // lower lid: hidden below when neutral, rises into a happy curve
+      e.lower.rotation.x = lerp(1.95, 0.02, happy);
+      // while squinting, the lid is drawn over the (flat) iris
+      e.lower.material.depthTest = happy < 0.05; e.lower.renderOrder = happy < 0.05 ? 0 : 3;
+      e.lash.material.opacity = Math.max(0, (closed - 0.8) / 0.2);
+      // brows: up when surprised, tilted when happy / sleepy, glance with the eyes
+      e.brow.position.y = 1.45 + surprised * 0.3 - sleepy * 0.15 + gaze.y * 0.08;
+      e.brow.position.x = gaze.x * 0.08;
+      e.brow.rotation.z = -e.side * (happy * 0.18 - sleepy * 0.1) + (react === "wink" && e.side > 0 ? 0.2 : 0);
+    });
+    hearts.forEach(function (h) { h.material.opacity = lerp(h.material.opacity, lov, k); h.scale.setScalar(0.8 + 0.15 * Math.sin(clock * 6)); });
+    zz.material.opacity = lerp(zz.material.opacity, sleepy, k); zz.position.y = 1.4 + ((clock * 0.5) % 1) * 0.6;
+  }
+
+  function resize() {
+    var w = window.innerWidth || 200, h = window.innerHeight || 100;
+    renderer.setSize(w, h, false); camera.aspect = w / h;
+    // fit both eyes across the width
+    // the eyes sit at the bottom (peeking over the edge); the space above is for jumps and spins
+    var needW = 5.6, needH = 3.9, cy = 0.8, fov = 24 * Math.PI / 180;
+    var dist = Math.max(needH / 2 / Math.tan(fov / 2), needW / 2 / Math.tan(fov / 2) / camera.aspect);
+    camera.position.set(0, cy, dist); camera.lookAt(0, cy, 0);
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  function loop(now) {
+    if (!running) return;
+    var dt = Math.min(0.05, (now - last) / 1000); last = now; acc += dt;
+    if (acc >= 1 / 30) { update(acc); renderer.render(scene, camera); acc = 0; }
+    requestAnimationFrame(loop);
+  }
+  function pause() { running = false; }
+  function resume() { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } }
+
+  var lastSeq = {};
+  window.addEventListener("message", function (e) {
+    var d = e.data || {};
+    if (d.mascot === "pause") pause();
+    if (d.mascot === "resume") resume();
+    if (d.eyes === "reduced") reduced = !!d.value;
+    if (d.eyes === "theme") setTheme(!!d.dark);
+    if (d.eyes === "look" && lastSeq.look !== d.seq) { lastSeq.look = d.seq; if (d.seq) look(+d.x || 0, +d.y || 0); }
+    if (d.eyes === "react" && lastSeq.react !== d.seq) { lastSeq.react = d.seq; if (d.seq && d.name) doReact(String(d.name)); }
+  });
+  document.addEventListener("visibilitychange", function () { document.hidden ? pause() : resume(); });
+  window.peekers = { look: look, react: doReact, pause: pause, resume: resume, theme: setTheme };
+
+  if (STILL) {
+    running = false;
+    setTimeout(function () {
+      resize(); nextBlink = 1e9; nextWander = 1e9;
+      if (params.get("react")) doReact(params.get("react"));
+      if (params.get("lx")) look(+params.get("lx"), +(params.get("ly") || 0));
+      var t = parseFloat(params.get("t") || "1.0");
+      for (var s = 0; s < Math.round(t / 0.025); s++) update(0.025);
+      renderer.render(scene, camera);
+      var img = new Image(); img.src = renderer.domElement.toDataURL("image/png");
+      img.style.cssText = "width:100%;height:100%;display:block";
+      renderer.domElement.style.display = "none"; document.body.appendChild(img);
+    }, 300);
+  } else {
+    requestAnimationFrame(loop);
+  }
+  notify("ready");
+})();
+</script>
+</body>
+</html>

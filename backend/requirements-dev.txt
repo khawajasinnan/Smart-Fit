@@ -1,0 +1,14 @@
+# Development & test dependencies — union of every service, plus tooling.
+# Used by CI and `docker compose --profile test run --rm backend-tests`.
+-r gateway/requirements.txt
+-r services/cv_analysis/requirements.txt
+-r services/recommendation/requirements.txt
+-r services/scraper/requirements.txt
+-r services/chat_orchestrator/requirements.txt
+-r services/tryon/requirements.txt
+-r services/hairstyle/requirements.txt
+-r services/scoring/requirements.txt
+pytest>=8.0
+ruff>=0.6
+# reads the iPhone (HEIC) photos in scripts/eval_gender_checks.py
+pillow-heif==0.22.0

@@ -1,0 +1,47 @@
+# AWS EKS target design (SRDS §2.5.2 / Fig 5.2) — documented, NOT deployed.
+# Expects a pre-created Secret `smartfit-secrets` in the smartfit namespace
+# (e.g. from AWS Secrets Manager via External Secrets) and images pushed to a
+# registry. Replace the <registry> placeholders before use.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+  - ingress.yaml
+  - retrain-cronjob.yaml
+
+patches:
+  - path: models-volume-shared.yaml
+  - path: recommendation-no-self-retrain.yaml
+
+images:
+  - name: smartfit/gateway
+    newName: <registry>/smartfit-gateway
+    newTag: "1.0.0"
+  - name: smartfit/cv-analysis
+    newName: <registry>/smartfit-cv-analysis
+    newTag: "1.0.0"
+  - name: smartfit/recommendation
+    newName: <registry>/smartfit-recommendation
+    newTag: "1.0.0"
+  - name: smartfit/scraper
+    newName: <registry>/smartfit-scraper
+    newTag: "1.0.0"
+  - name: smartfit/chat-orchestrator
+    newName: <registry>/smartfit-chat-orchestrator
+    newTag: "1.0.0"
+  - name: smartfit/tryon
+    newName: <registry>/smartfit-tryon
+    newTag: "1.0.0"
+  - name: smartfit/hairstyle
+    newName: <registry>/smartfit-hairstyle
+    newTag: "1.0.0"
+  - name: smartfit/scoring
+    newName: <registry>/smartfit-scoring
+    newTag: "1.0.0"
+
+replicas:
+  - name: gateway
+    count: 2
+  - name: recommendation
+    count: 2

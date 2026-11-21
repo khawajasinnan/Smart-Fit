@@ -1,0 +1,23 @@
+# Normalise line endings so Windows and Linux teammates produce identical files.
+* text=auto eol=lf
+
+# Windows scripts keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+
+# Binary assets — never touch line endings or diff them.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.ttf binary
+*.otf binary
+*.task binary
+*.jar binary
+*.zip binary
+*.pdf binary
+*.keystore binary
+*.jks binary

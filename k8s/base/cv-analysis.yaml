@@ -1,0 +1,64 @@
+# MediaPipe pose / body shape / skin tone (SFR-019..021)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cv-analysis
+  labels:
+    app.kubernetes.io/name: cv-analysis
+    app.kubernetes.io/part-of: smartfit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cv-analysis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cv-analysis
+        app.kubernetes.io/part-of: smartfit
+    spec:
+      containers:
+        - name: cv-analysis
+          image: smartfit/cv-analysis
+          ports:
+            - name: http
+              containerPort: 8001
+          envFrom:
+            - configMapRef:
+                name: smartfit-config
+            - secretRef:
+                name: smartfit-secrets
+                optional: true
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cv-analysis
+  labels:
+    app.kubernetes.io/name: cv-analysis
+    app.kubernetes.io/part-of: smartfit
+spec:
+  selector:
+    app.kubernetes.io/name: cv-analysis
+  ports:
+    - name: http
+      port: 8001
+      targetPort: http

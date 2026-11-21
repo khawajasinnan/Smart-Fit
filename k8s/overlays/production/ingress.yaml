@@ -1,0 +1,27 @@
+# Public HTTPS entry point (TLS 1.2+ per SRDS §4.2). Only the gateway is exposed.
+# Placeholder host / certificate — fill in when a domain exists.
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: smartfit-gateway
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-TLS13-1-2-2021-06
+spec:
+  ingressClassName: alb
+  tls:
+    - hosts:
+        - api.smartfit.example
+  rules:
+    - host: api.smartfit.example
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway
+                port:
+                  number: 8000

@@ -1,0 +1,13 @@
+-- ============================================================
+-- SmartFit — local development seed
+--
+-- Runs only on a LOCAL stack (`npx supabase db reset`); it is never applied
+-- to the hosted project. Intentionally empty: users, profiles and chat data
+-- are created through the app's own sign-up flow, and products come from
+-- the live scraper / local catalog in backend/services/recommendation.
+--
+-- Add clearly-labelled sample rows below if a local demo needs them, e.g.:
+--
+-- INSERT INTO public.products (brand, title, category, gender, price_pkr, product_url)
+-- VALUES ('SAMPLE', 'Sample Kurta (local seed)', 'kurta', 'male', 4990, 'https://example.com/sample');
+-- ============================================================

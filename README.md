@@ -67,6 +67,17 @@ supabase_setup.sql
 flutter run
 ```
 
+5. Backend CV models (once, from `backend/` in `.venv-cpu`; needs `pip install onnx` for the export):
+
+```bash
+python scripts/download_cv_models.py
+```
+
+This fetches the MediaPipe face landmarker and the OpenPose body model (CMU
+weights: non-commercial/academic licence), checks their SHA-256, and exports
+OpenPose to ONNX (~200 MB, gitignored). Without it the CV service still runs;
+the detailed scan simply skips the face mesh / OpenPose.
+
 ## Verification
 
 Use these commands before pushing changes:

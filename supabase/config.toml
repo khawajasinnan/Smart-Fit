@@ -1,0 +1,40 @@
+# Supabase CLI configuration — used only for a LOCAL stack
+# (`npx supabase start`). The hosted project is configured in the dashboard.
+
+project_id = "smartfit"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+# Match your hosted project's Postgres major version
+# (Dashboard -> Project Settings -> Infrastructure).
+major_version = 17
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+site_url = "http://127.0.0.1:3000"
+# Deep link the mobile app listens on (see frontend AndroidManifest / Info.plist).
+additional_redirect_urls = ["io.supabase.smartfit://login-callback/"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = true
+otp_length = 6
+otp_expiry = 3600

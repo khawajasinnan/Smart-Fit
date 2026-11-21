@@ -1,0 +1,15 @@
+# Production: one CronJob retrains (retrain-cronjob.yaml), not the 2 replicas (spec §23.26).
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation
+spec:
+  strategy:
+    type: RollingUpdate
+  template:
+    spec:
+      containers:
+        - name: recommendation
+          env:
+            - name: AUTO_RETRAIN_HOURS
+              value: "0"

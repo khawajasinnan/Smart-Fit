@@ -1,0 +1,11 @@
+# services/tryon — runtime dependencies (CPU service; the GPU model runs on
+# Modal, see modal_app.py, which declares its own GPU image).
+fastapi>=0.115,<1
+uvicorn[standard]>=0.32
+pydantic>=2.8,<3
+pydantic-settings>=2.6,<3
+httpx>=0.27,<1
+pillow>=10.3
+numpy>=1.26
+# Client for the Modal GPU app (TRYON_BACKEND=modal) and the deploy CLI.
+modal>=1.0

@@ -1,0 +1,15 @@
+# Self-learning in production (spec §23.26). The recommendation service runs
+# 2 replicas here, so:
+#  * its model volume is shared (ReadWriteMany: AWS EFS) — both replicas read
+#    the same live models and reload when a new one is promoted;
+#  * the replicas don't retrain themselves (AUTO_RETRAIN_HOURS=0); ONE nightly
+#    CronJob does, with the same command the in-service schedule runs.
+# Scoring stays 1 replica and retrains itself (base settings).
+# Replace <efs-storage-class> with the cluster's EFS StorageClass name.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: recommendation-models
+spec:
+  accessModes: ["ReadWriteMany"]
+  storageClassName: <efs-storage-class>

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>SmartFit</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>smartfit</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<!-- Supabase auth redirect: io.supabase.smartfit://login-callback/ -->
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>io.supabase.smartfit</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UISupportedInterfaceOrientations~ipad</key>
+	<array>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>mailto</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>SmartFit uses the camera for profile and outfit photos and the body &amp; face scan.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SmartFit uses your photo library so you can upload outfit and profile photos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>SmartFit saves your virtual try-on images to your photo library when you tap Download.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>SmartFit uses the microphone for voice input in the AI stylist chat.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>SmartFit uses speech recognition to turn your voice into chat messages.</string>
+	<!-- Same as Android (flutter_deeplinking_enabled=false): the Google sign-in
+	     callback io.supabase.smartfit://login-callback/ is handled by Supabase,
+	     never by the app's router, so it can't skip the profile-setup guard. -->
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>SmartFit connects to the SmartFit server on your Wi-Fi network for the AI stylist, try-on and hairstyles.</string>
+	<!-- Development: the backend runs on a laptop on the same Wi-Fi over plain http
+	     (env/dev.json). Only local addresses are allowed; everything else stays https. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

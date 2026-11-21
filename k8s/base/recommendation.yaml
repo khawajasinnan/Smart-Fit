@@ -1,0 +1,83 @@
+# Ranking + local catalog fallback (SFR-023..025)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recommendation
+  labels:
+    app.kubernetes.io/name: recommendation
+    app.kubernetes.io/part-of: smartfit
+spec:
+  replicas: 1
+  # one writer for the model volume (spec §23.26): stop the old pod first
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: recommendation
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: recommendation
+        app.kubernetes.io/part-of: smartfit
+    spec:
+      initContainers:
+        # first boot / feature-list change: copy the image's models onto the volume;
+        # otherwise keep the models learned from users
+        - name: seed-models
+          image: smartfit/recommendation
+          command: ["python", "-m", "shared.seed_models", "/app/services/recommendation/ml/models", "/models", "model_card.json"]
+          volumeMounts:
+            - name: models
+              mountPath: /models
+      containers:
+        - name: recommendation
+          image: smartfit/recommendation
+          ports:
+            - name: http
+              containerPort: 8002
+          envFrom:
+            - configMapRef:
+                name: smartfit-config
+            - secretRef:
+                name: smartfit-secrets
+                optional: true
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              memory: 2Gi  # includes the scheduled retraining process
+          volumeMounts:
+            - name: models
+              mountPath: /app/services/recommendation/ml/models
+      volumes:
+        - name: models
+          persistentVolumeClaim:
+            claimName: recommendation-models
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recommendation
+  labels:
+    app.kubernetes.io/name: recommendation
+    app.kubernetes.io/part-of: smartfit
+spec:
+  selector:
+    app.kubernetes.io/name: recommendation
+  ports:
+    - name: http
+      port: 8002
+      targetPort: http

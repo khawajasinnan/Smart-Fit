@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SmartFit (debug)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "frontend",
+      "program": "lib/main.dart",
+      "args": ["--dart-define-from-file=env/dev.json"]
+    },
+    {
+      "name": "SmartFit (profile)",
+      "type": "dart",
+      "request": "launch",
+      "cwd": "frontend",
+      "program": "lib/main.dart",
+      "flutterMode": "profile",
+      "args": ["--dart-define-from-file=env/dev.json"]
+    },
+    {
+      "name": "Backend gateway (uvicorn, no Docker)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "uvicorn",
+      "cwd": "${workspaceFolder}/backend",
+      "args": ["gateway.main:app", "--reload", "--port", "8000"],
+      "justMyCode": true
+    }
+  ]
+}

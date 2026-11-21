@@ -1,0 +1,14 @@
+{
+  "name": "smartfit-e2e",
+  "private": true,
+  "description": "Playwright end-to-end tests of the SmartFit web build and admin panel (SRDS 4.3.6).",
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1",
+    "dotenv": "16.4.7"
+  }
+}

@@ -1,7 +1,11 @@
-.dart_tool/
-build/
 .git/
-android/.gradle/
-ios/Pods/
-assets/fonts/
-assets/animations/
+**/.dart_tool/
+**/build/
+frontend/android/.gradle/
+frontend/android/.kotlin/
+frontend/ios/Pods/
+frontend/assets/fonts/
+frontend/assets/lottie/
+backend/venv/
+datasets/
+**/__pycache__/

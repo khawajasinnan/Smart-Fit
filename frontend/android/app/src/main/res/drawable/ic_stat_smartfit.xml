@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Notification small icon: the SmartFit "fit" tag as a white silhouette
+     with its string hole (Android tints it). Matches the app icon's tag. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="100"
+    android:viewportHeight="100">
+    <group
+        android:pivotX="50"
+        android:pivotY="52"
+        android:rotation="-12">
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:fillType="evenOdd"
+            android:pathData="M33,33 H77 Q83,33 83,39 V65 Q83,71 77,71 H33 L19,52 Z M27,52 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0 Z" />
+    </group>
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFFFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"
+        android:pathData="M30,50 C22,38 15,32 12,22" />
+</vector>

@@ -1,0 +1,16 @@
+# services/hairstyle — runtime dependencies
+fastapi>=0.115,<1
+uvicorn[standard]>=0.32
+pydantic>=2.8,<3
+pydantic-settings>=2.6,<3
+httpx>=0.27,<1
+# MediaPipe (face detector, face mesh, hair segmenter) pulls in opencv-contrib-python (cv2).
+mediapipe>=0.10.14
+numpy>=1.26
+Pillow>=10.4
+# dlib's HOG face detector + 5-point landmarks; dlib-bin = prebuilt wheels (no C++ build).
+dlib-bin>=19.24
+# Spec §23.27: the straight/wavy classifier (Random Forest) and the Modal client for HairFastGAN
+scikit-learn>=1.5,<2
+joblib>=1.4
+modal>=1.0

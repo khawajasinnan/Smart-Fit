@@ -1,0 +1,113 @@
+name: smartfit
+description: "SmartFit — AI-driven virtual try-on & outfit recommendation app"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.9.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Auth
+  supabase_flutter: ^2.0.0
+
+  # State management
+  flutter_riverpod: ^2.4.0
+
+  # Routing
+  go_router: ^14.0.0
+
+  # Networking (the only HTTP client — rules.md §2.1)
+  dio: ^5.11.1
+
+  # UI
+  image_picker: ^1.0.4
+
+  # Local storage
+  hive_flutter: ^1.1.0
+  shared_preferences: ^2.2.0
+
+  # Utils
+  intl: ^0.18.0
+  uuid: ^4.2.1
+  speech_to_text: ^7.0.0
+
+  camera: ^0.12.0+1
+  google_mlkit_pose_detection: ^0.12.0
+  google_mlkit_face_detection: ^0.11.1
+  flutter_animate: ^4.5.2
+  url_launcher: ^6.2.0
+  shimmer: ^3.0.0
+  animations: ^2.2.0
+  cached_network_image: ^3.4.1
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
+  flutter_timezone: ^5.1.1
+  package_info_plus: ^10.2.2
+  webview_flutter: ^4.14.1  # Zayn 3D mascot (Android / iOS)
+  web: ^1.1.1  # Zayn mascot iframe on Flutter web
+  flutter_tts: ^4.2.5  # Zayn's voice (the phone's own text-to-speech)
+  gal: ^3.0.0
+
+dev_dependencies:
+  fake_async: ^1.3.3  # Zayn mascot timer tests
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/lottie/
+    # Zayn, the 3D stylist mascot (three.js page + still frames for the fallback)
+    - assets/mascot/
+    - assets/mascot/still/
+    # the loader's spinning 3D tee (made by tool/loader_cloth/)
+    - assets/loader/
+    # App config read at start-up (Env.load). Public client values only;
+    # dev.json is gitignored: copy env/env.example.json to create it.
+    - env/
+
+  fonts:
+    # Display / headings (design.md §3)
+    - family: SpaceGrotesk
+      fonts:
+        - asset: assets/fonts/SpaceGrotesk-Light.ttf
+          weight: 300
+        - asset: assets/fonts/SpaceGrotesk-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/SpaceGrotesk-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/SpaceGrotesk-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/SpaceGrotesk-Bold.ttf
+          weight: 700
+    # Body / UI text (design.md §3) — Inter 4.1, SIL OFL (assets/fonts/OFL-Inter.txt)
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Inter-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Inter-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Inter-Bold.ttf
+          weight: 700
+    # Wordmark (logo C, "Fit Tag") — Unbounded variable font, SIL OFL (assets/fonts/OFL-Unbounded.txt)
+    - family: Unbounded
+      fonts:
+        - asset: assets/fonts/Unbounded-Variable.ttf
+
+# App icon: neon hanger + T-shirt mark (18 Nov 2026; source docs/brand/smartfit_mark.svg). Regenerate with: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/app_icon.png
+  adaptive_icon_background: "#0A0C0A"
+  adaptive_icon_foreground: assets/icon/app_icon_foreground.png
+  remove_alpha_ios: true

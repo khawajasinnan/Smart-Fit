@@ -1,0 +1,45 @@
+# Nightly self-learning for the recommendation models (spec §23.26). Retrains
+# only when there are enough new reactions, promotes only a model that is at
+# least as good on held-out real feedback, and records every attempt in
+# history.json on the shared volume (GET /api/v1/admin/ml shows it).
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: recommendation-retrain
+  labels:
+    app.kubernetes.io/name: recommendation-retrain
+    app.kubernetes.io/part-of: smartfit
+spec:
+  schedule: "30 2 * * *"  # 02:30 every night (quiet hours)
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 7200
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: retrain
+              image: smartfit/recommendation
+              command: ["python", "-m", "services.recommendation.ml.auto_retrain", "--auto"]
+              envFrom:
+                - configMapRef:
+                    name: smartfit-config
+                - secretRef:
+                    name: smartfit-secrets
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 512Mi
+                limits:
+                  memory: 1Gi
+              volumeMounts:
+                - name: models
+                  mountPath: /app/services/recommendation/ml/models
+          volumes:
+            - name: models
+              persistentVolumeClaim:
+                claimName: recommendation-models

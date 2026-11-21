@@ -1,0 +1,140 @@
+# SmartFit — local development stack.
+#   cp .env.example .env        # fill in Supabase + Gemini values
+#   docker compose up --build   # gateway on http://localhost:8000 (docs: /docs)
+#   docker compose --profile test run --rm backend-tests
+#
+# Only the gateway is published; the other services talk over the compose
+# network using the default URLs in backend/shared/config.py.
+name: smartfit
+
+x-backend: &backend
+  env_file:
+    - path: .env
+      required: false
+  restart: unless-stopped
+
+services:
+  gateway:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: gateway/Dockerfile
+    image: smartfit/gateway:dev
+    ports:
+      - "8000:8000"
+    depends_on:
+      - cv-analysis
+      - recommendation
+      - chat-orchestrator
+      - tryon
+      - hairstyle
+      - scoring
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  cv-analysis:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/cv_analysis/Dockerfile
+    image: smartfit/cv-analysis:dev
+    expose:
+      - "8001"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8001/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  recommendation:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/recommendation/Dockerfile
+    image: smartfit/recommendation:dev
+    expose:
+      - "8002"
+    # learned models survive restarts (spec §23.26); filled from the image on first use
+    volumes:
+      - recommendation-models:/app/services/recommendation/ml/models
+    depends_on:
+      - scraper
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8002/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  scraper:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/scraper/Dockerfile
+    image: smartfit/scraper:dev
+    expose:
+      - "8003"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8003/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  chat-orchestrator:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/chat_orchestrator/Dockerfile
+    image: smartfit/chat-orchestrator:dev
+    expose:
+      - "8004"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8004/health', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  tryon:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/tryon/Dockerfile
+    image: smartfit/tryon:dev
+    expose:
+      - "8005"
+
+  hairstyle:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/hairstyle/Dockerfile
+    image: smartfit/hairstyle:dev
+    expose:
+      - "8006"
+
+  scoring:
+    <<: *backend
+    build:
+      context: ./backend
+      dockerfile: services/scoring/Dockerfile
+    image: smartfit/scoring:dev
+    expose:
+      - "8007"
+    volumes:
+      - scoring-models:/app/services/scoring/models
+
+  # Runs the backend test suite (incl. MediaPipe tests) in Python 3.12.
+  backend-tests:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    image: smartfit/backend-tests:dev
+    command: ["pytest", "-q"]
+
+# Self-learning model folders (spec §23.26)
+volumes:
+  recommendation-models:
+  scoring-models:

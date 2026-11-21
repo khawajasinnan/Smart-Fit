@@ -1,0 +1,17 @@
+# CatVTON baseline env (Python 3.11). torch/torchvision are installed first
+# from the PyTorch index (cu121 on Kaggle, cpu for the local smoke test):
+#   torch==2.5.1 torchvision==0.20.1
+# Repo pins diffusers 0.29.2 / accelerate 0.31.0; transformers is only used
+# for CLIPImageProcessor. huggingface_hub < 0.26 keeps cached_download.
+diffusers==0.29.2
+transformers==4.44.2
+accelerate==0.31.0
+huggingface_hub==0.25.2
+safetensors==0.4.5
+numpy==1.26.4
+pillow==10.4.0
+tqdm==4.66.5
+packaging==24.1
+# paired metrics (common.paired_metrics)
+scikit-image==0.24.0
+lpips==0.1.4

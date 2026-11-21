@@ -1,0 +1,723 @@
+<!doctype html>
+<!--
+  Zayn, SmartFit's AI stylist (spec §23.14, §23.16). A sassy Gen-Z designer
+  guy built from three.js primitives (three.min.js r149, MIT, bundled next to
+  this file), so it works offline and has no third-party model licence.
+  Textured curtain-fringe hair, round tinted glasses, oversized cropped
+  bomber over a white tee, thin gold chain, chunky sneakers.
+
+  API (Flutter calls these through the WebView / iframe):
+    zayn.setMood(name)       idle hello happy excited sassy confused sad thinking
+                             listening love surprised proud wink eyeroll shrug
+                             clap dance hairflip cool vogue snap strut kiss selfie
+                             spin facepalm thumbsup nod headshake bow point laugh
+                             yawn measure
+                             (idle = a hip-popped, never-straight rest with random
+                             fidgets: nail check, glasses, hair touch, shimmy, ...)
+    zayn.setReducedMotion(b) true = gentle motion only (OS "remove animations")
+    zayn.setSpeaking(b)      talking mouth + sound waves while the app speaks
+    zayn.pause() / resume()  stop rendering while hidden
+  The app posts {zayn: "setMood", mood} / {zayn: "reduced"|"speaking", value} / {mascot: "pause"|"resume"};
+  the page answers "ready" / "nowebgl" (MascotChannel on mobile, {mascotEvent} to the parent on the web).
+  Query for still renders (tests / screenshots / icon):
+    ?mood=sassy&t=1.4&still=1[&bg=f6f3ff][&speaking=1][&portrait=1]
+-->
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: transparent; }
+  canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+</style>
+</head>
+<body>
+<script src="three.min.js"></script>
+<script>
+(function () {
+  "use strict";
+  var params = new URLSearchParams(location.search);
+  var STILL = params.get("still") === "1";
+  var PORTRAIT = params.get("portrait") === "1";
+
+  function notify(msg) {
+    try { if (window.MascotChannel) window.MascotChannel.postMessage(msg); } catch (e) {}
+    try { if (window.parent !== window) window.parent.postMessage({ mascotEvent: msg }, "*"); } catch (e) {}
+  }
+
+  // ── WebGL check ──────────────────────────────────────────────────────────
+  var probe = document.createElement("canvas");
+  var gl = probe.getContext("webgl") || probe.getContext("experimental-webgl");
+  if (!gl || typeof THREE === "undefined") { notify("nowebgl"); return; }
+
+  // ── Renderer / scene / camera ────────────────────────────────────────────
+  THREE.ColorManagement.legacyMode = false;  // hex colours are sRGB, as designed
+  var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: STILL });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  if (params.get("bg")) renderer.setClearColor(parseInt(params.get("bg"), 16), 1);  // previews only
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  document.body.appendChild(renderer.domElement);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+  var CAM = PORTRAIT ? { y: 0.62, z: 4.1, look: 0.55 } : { y: 0.3, z: 6.9, look: 0.05 };
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a948b, 0.95));
+  var key = new THREE.DirectionalLight(0xffffff, 1.05); key.position.set(3, 5, 6); scene.add(key);
+  var rim = new THREE.DirectionalLight(0x9dffb0, 0.5); rim.position.set(-4, 2, -3); scene.add(rim);
+  var fill = new THREE.DirectionalLight(0xfff4ec, 0.45); fill.position.set(-4, 1.5, 5); scene.add(fill);  // softens the toon split on the face
+
+  // 3-step toon shading
+  var gradTex = new THREE.DataTexture(new Uint8Array([150, 150, 150, 255, 210, 210, 210, 255, 255, 255, 255, 255]), 3, 1);
+  gradTex.minFilter = THREE.NearestFilter; gradTex.magFilter = THREE.NearestFilter; gradTex.needsUpdate = true;
+  function toon(color, opts) { return new THREE.MeshToonMaterial(Object.assign({ color: color, gradientMap: gradTex }, opts || {})); }
+  function basic(color, opts) { return new THREE.MeshBasicMaterial(Object.assign({ color: color }, opts || {})); }
+  function mesh(geo, mat, parent, x, y, z) { var m = new THREE.Mesh(geo, mat); m.position.set(x || 0, y || 0, z || 0); if (parent) parent.add(m); return m; }
+
+  var C = { skin: 0xbb8768, skinDark: 0xa1704f, hair: 0x2a1c18, jacket: 0x252b26, rib: 0x39ff5a, tee: 0xf6f8f5,
+            pants: 0x3a4250, shoe: 0xfbfbfb, sole: 0x39ff5a, gold: 0xd9a838, ink: 0x1e1638, white: 0xffffff,
+            lens: 0xa8f0bb, pink: 0xff6fb1, iris: 0x3b2418 };
+
+  // ── Character ────────────────────────────────────────────────────────────
+  var root = new THREE.Group(); scene.add(root);          // position / bounce
+  var body = new THREE.Group(); root.add(body);           // lean / sway / squash (pivot at the hips)
+  body.position.y = -0.45;
+  var torso = new THREE.Group(); torso.position.y = 0.45; body.add(torso);
+  var neck = mesh(new THREE.CylinderGeometry(0.13, 0.15, 0.22, 20), toon(C.skin), torso, 0, 0.27, 0);
+  var head = new THREE.Group(); head.position.y = 0.8; torso.add(head);   // head pivot at the neck
+  var face = new THREE.Group(); face.position.y = 0.0; head.add(face);
+
+  // tee + cropped oversized bomber (open at the front) + chain
+  var tee = mesh(new THREE.CapsuleGeometry(0.36, 0.3, 8, 24), toon(C.tee), torso, 0, -0.08, 0);
+  var waist = mesh(new THREE.CylinderGeometry(0.42, 0.4, 0.3, 32), toon(C.pants), torso, 0, -0.56, 0);
+  waist.scale.set(1, 1, 0.78);
+  tee.scale.set(1.05, 1, 0.74);
+  var jacketMat = toon(C.jacket, { side: THREE.DoubleSide });
+  var jacket = mesh(new THREE.CylinderGeometry(0.47, 0.52, 0.66, 40, 1, true, 0.42, Math.PI * 2 - 0.84), jacketMat, torso, 0, -0.12, 0);
+  jacket.scale.set(1.04, 1, 0.8);
+  [-1, 1].forEach(function (s) {
+    var sh = mesh(new THREE.SphereGeometry(0.26, 24, 16), toon(C.jacket), torso, s * 0.4, 0.14, 0);
+    sh.scale.set(1.1, 0.8, 1.0);
+    // zip edges of the open jacket
+    var zip = mesh(new THREE.BoxGeometry(0.03, 0.6, 0.02), toon(C.gold), torso, s * 0.19, -0.13, 0.39);
+    zip.rotation.z = s * 0.05;
+  });
+  var hem = mesh(new THREE.TorusGeometry(0.5, 0.075, 12, 48), toon(C.rib), torso, 0, -0.47, 0);
+  hem.rotation.x = Math.PI / 2; hem.scale.set(1.04, 0.8, 1);
+  var collar = mesh(new THREE.TorusGeometry(0.27, 0.07, 12, 40), toon(C.rib), torso, 0, 0.2, -0.02);
+  collar.rotation.x = Math.PI / 2 - 0.15; collar.scale.set(1.15, 0.85, 1);
+  var chain = mesh(new THREE.TorusGeometry(0.17, 0.016, 8, 40, Math.PI), toon(C.gold), torso, 0, 0.17, 0.3);
+  chain.rotation.set(-0.35, 0, Math.PI); chain.scale.set(1, 1.15, 1);
+  var pendant = mesh(new THREE.OctahedronGeometry(0.045), toon(C.gold), torso, 0, -0.02, 0.36);
+  // tiny "SF" designer patch on the sleeve-side chest
+  var patch = mesh(new THREE.CircleGeometry(0.07, 24), basic(C.rib), torso, -0.33, 0.02, 0.37);
+  patch.rotation.y = -0.45;
+
+  // legs (wide relaxed trousers) + chunky sneakers; pivots at the hips for dancing
+  function makeLeg(s) {
+    var hip = new THREE.Group(); hip.position.set(s * 0.2, 0, 0); body.add(hip);
+    var leg = mesh(new THREE.CylinderGeometry(0.17, 0.2, 0.74, 20), toon(C.pants), hip, 0, -0.37, 0);
+    var shoe = new THREE.Group(); shoe.position.set(0, -0.82, 0.06); hip.add(shoe);
+    var upper = mesh(new THREE.SphereGeometry(0.2, 24, 16), toon(C.shoe), shoe, 0, 0.02, 0.04);
+    upper.scale.set(1.0, 0.62, 1.45);
+    var sole = mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.08, 24), toon(C.sole), shoe, 0, -0.1, 0.05);
+    sole.scale.set(1.05, 1, 1.55);
+    var swoosh = mesh(new THREE.TorusGeometry(0.1, 0.018, 6, 20, Math.PI * 0.8), toon(C.rib), shoe, s * 0.19, 0.0, 0.05);
+    swoosh.rotation.set(0, s * Math.PI / 2, 0.4);
+    return hip;
+  }
+  var legL = makeLeg(-1), legR = makeLeg(1);
+
+  // arms: shoulder pivot -> upper sleeve -> elbow pivot -> forearm sleeve, rib cuff, hand
+  function makeArm(s) {
+    var shoulder = new THREE.Group(); shoulder.position.set(s * 0.5, 0.1, 0); torso.add(shoulder);
+    mesh(new THREE.CapsuleGeometry(0.13, 0.26, 6, 14), toon(C.jacket), shoulder, 0, -0.2, 0);
+    var elbow = new THREE.Group(); elbow.position.y = -0.4; shoulder.add(elbow);
+    mesh(new THREE.CapsuleGeometry(0.12, 0.2, 6, 14), toon(C.jacket), elbow, 0, -0.15, 0);
+    var cuff = mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08, 16), toon(C.rib), elbow, 0, -0.32, 0);
+    var hand = mesh(new THREE.SphereGeometry(0.11, 20, 16), toon(C.skin), elbow, 0, -0.42, 0);
+    hand.scale.set(0.95, 1.1, 0.85);
+    var thumb = mesh(new THREE.CapsuleGeometry(0.035, 0.06, 4, 8), toon(C.skin), hand, -s * 0.08, 0.02, 0.05);
+    thumb.rotation.z = s * 0.7;
+    return { shoulder: shoulder, elbow: elbow };
+  }
+  var armL = makeArm(-1), armR = makeArm(1);
+  // hot-pink case, held up above the hand so it reads from the front
+  var phone = new THREE.Group(); phone.position.set(0.02, -0.6, 0.06); phone.rotation.set(-1.3, 0, 0.1);
+  mesh(new THREE.BoxGeometry(0.17, 0.3, 0.03), toon(0x39ff5a), phone);
+  mesh(new THREE.CircleGeometry(0.025, 16), basic(0x1e1638), phone, 0.045, 0.1, -0.017).rotation.y = Math.PI;  // camera lens
+  var screen = mesh(new THREE.PlaneGeometry(0.085, 0.17), basic(0xff8fd0), phone, 0, 0, 0.0095);
+  screen.rotation.y = Math.PI;   // the screen faces Zayn
+  phone.visible = false; armR.elbow.add(phone);
+
+  // head: face, ears, nose
+  var skull = mesh(new THREE.SphereGeometry(0.6, 48, 36), toon(C.skin), face, 0, 0, 0);
+  skull.scale.set(1, 1.04, 0.97);
+  [-1, 1].forEach(function (s) {
+    var ear = mesh(new THREE.SphereGeometry(0.12, 16, 12), toon(C.skin), face, s * 0.59, -0.02, 0);
+    ear.scale.set(0.45, 1, 0.75);
+  });
+  var stud = mesh(new THREE.SphereGeometry(0.03, 10, 8), toon(C.gold), face, 0.62, -0.13, 0.03);
+  var hoop = mesh(new THREE.TorusGeometry(0.05, 0.012, 8, 24), toon(C.gold), face, -0.62, -0.17, 0.03);
+  hoop.rotation.y = Math.PI / 2;
+  var nose = mesh(new THREE.SphereGeometry(0.075, 16, 12), toon(C.skinDark), face, 0, -0.1, 0.6);
+  nose.scale.set(0.9, 0.85, 0.8);
+
+  // eyes (white, iris, pupil, shine) with skin-coloured lids
+  function makeEye(x) {
+    var g = new THREE.Group(); g.position.set(x, 0.04, 0.53); face.add(g);
+    var white = mesh(new THREE.SphereGeometry(0.115, 28, 20), basic(C.white), g);
+    white.scale.set(1, 1.1, 0.5);
+    var iris = mesh(new THREE.SphereGeometry(0.075, 20, 14), basic(C.iris), g, 0, 0, 0.04);
+    iris.scale.set(1, 1.1, 0.4);
+    var pupil = mesh(new THREE.SphereGeometry(0.04, 14, 10), basic(C.ink), iris, 0, 0, 0.03);
+    mesh(new THREE.SphereGeometry(0.022, 10, 8), basic(C.white), iris, 0.028, 0.035, 0.06);
+    var lid = mesh(new THREE.SphereGeometry(0.125, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), toon(C.skin), g, 0, 0, 0.005);
+    lid.scale.set(1.06, 1.18, 0.62);
+    // closed-eye lash line (a soft "u"), shown when the lid is down
+    var lash = mesh(new THREE.TorusGeometry(0.085, 0.014, 6, 20, Math.PI), basic(C.ink, { transparent: true, opacity: 0 }), g, 0, 0.0, 0.085);
+    lash.rotation.z = Math.PI;
+    return { g: g, white: white, iris: iris, lid: lid, lash: lash };
+  }
+  var eyeL = makeEye(-0.21), eyeR = makeEye(0.21);
+
+  function makeBrow(x, side) {
+    var g = new THREE.Group(); g.position.set(x, 0.24, 0.55); g.userData.side = side; face.add(g);
+    var b = mesh(new THREE.CapsuleGeometry(0.035, 0.15, 4, 8), basic(C.hair), g);
+    b.rotation.z = Math.PI / 2;
+    return g;
+  }
+  var browL = makeBrow(-0.21, -1), browR = makeBrow(0.21, 1);
+
+  // mouth: a tube along a curve (rebuilt when the shape changes) + open mouth
+  var mouthMat = basic(C.ink), mouthMesh = null, mouthKey = "";
+  var MOUTH_Y = -0.3, MOUTH_Z = 0.5;
+  var mouthOpenMesh = mesh(new THREE.SphereGeometry(0.09, 24, 16), basic(0x3a1430), face, 0, MOUTH_Y - 0.03, MOUTH_Z + 0.01);
+  mouthOpenMesh.scale.set(1.25, 0.01, 0.35);
+  var teeth = mesh(new THREE.BoxGeometry(0.11, 0.03, 0.02), basic(C.white), mouthOpenMesh, 0, 0.055, 0.07);
+  var tongue = mesh(new THREE.SphereGeometry(0.05, 16, 12), basic(0xff7ab8), mouthOpenMesh, 0, -0.04, 0.05);
+  tongue.scale.set(1.3, 0.6, 0.5);
+  function setMouth(curve, width, side) {
+    var k = curve.toFixed(2) + "|" + width.toFixed(2) + "|" + side.toFixed(2);
+    if (k === mouthKey) return; mouthKey = k;
+    if (mouthMesh) { face.remove(mouthMesh); mouthMesh.geometry.dispose(); }
+    var w = 0.13 * width, y = MOUTH_Y;
+    var path = new THREE.QuadraticBezierCurve3(
+      new THREE.Vector3(-w, y + side * 0.035, MOUTH_Z - 0.02), new THREE.Vector3(0, y - curve * 0.1, MOUTH_Z + 0.03),
+      new THREE.Vector3(w, y - side * 0.035 + Math.max(0, side) * 0.05, MOUTH_Z - 0.02));
+    mouthMesh = new THREE.Mesh(new THREE.TubeGeometry(path, 24, 0.024, 8, false), mouthMat);
+    face.add(mouthMesh);
+  }
+
+  function blush(x) {
+    var m = mesh(new THREE.CircleGeometry(0.075, 24), basic(C.pink, { transparent: true, opacity: 0 }), face, x, -0.13, 0.5);
+    m.scale.set(1.3, 0.7, 1); m.rotation.y = x * 1.4; return m;
+  }
+  var blushL = blush(-0.36), blushR = blush(0.36);
+
+  // hair: dark cap over the top / back, textured top, curtain fringe (parted in the middle)
+  var hairMat = toon(C.hair);
+  var hairGroup = new THREE.Group(); face.add(hairGroup);
+  var cap = mesh(new THREE.SphereGeometry(0.64, 40, 24, 0, Math.PI * 2, 0, Math.PI * 0.42), hairMat, hairGroup, 0, 0.04, -0.04);
+  cap.rotation.x = -0.42;
+  var back = mesh(new THREE.SphereGeometry(0.62, 32, 20, 0, Math.PI * 2, 0, Math.PI * 0.5), hairMat, hairGroup, 0, 0, -0.1);
+  back.rotation.x = -2.3;    // the back of the head, down to the nape (hidden from the front)
+  // textured crop on top: low, flat tufts
+  [[0, 0.5, 0.18, 0.2], [-0.2, 0.48, 0.12, 0.17], [0.21, 0.48, 0.12, 0.17], [-0.1, 0.55, -0.08, 0.19], [0.12, 0.55, -0.06, 0.19],
+   [-0.3, 0.42, -0.1, 0.16], [0.31, 0.42, -0.1, 0.16], [0, 0.48, -0.3, 0.2]].forEach(function (p) {
+    var tuft = mesh(new THREE.SphereGeometry(p[3], 20, 14), hairMat, hairGroup, p[0], p[1], p[2]);
+    tuft.scale.set(1.15, 0.55, 1.0);
+  });
+  // curtain fringe: two swoops parted in the middle, falling to the temples
+  var fringe = new THREE.Group(); fringe.position.set(0, 0.36, 0.34); hairGroup.add(fringe);
+  [-1, 1].forEach(function (s) {
+    var swoop = mesh(new THREE.SphereGeometry(0.26, 28, 18), hairMat, fringe, s * 0.2, -0.03, 0.06);
+    swoop.scale.set(1.12, 0.5, 0.62); swoop.rotation.z = s * 0.38; swoop.rotation.x = 0.4;
+    // pink-dyed tips: very Gen-Z
+    var tip = mesh(new THREE.SphereGeometry(0.13, 20, 14), toon(0x5cff78), fringe, s * 0.4, -0.15, 0.0);
+    tip.scale.set(0.8, 0.9, 0.7); tip.rotation.z = s * 0.6;
+  });
+
+  // round tinted glasses with gold frames
+  var glasses = new THREE.Group(); face.add(glasses);
+  var lensMat = new THREE.MeshBasicMaterial({ color: C.lens, transparent: true, opacity: 0.3, depthWrite: false });
+  [-0.21, 0.21].forEach(function (x) {
+    var frame = mesh(new THREE.TorusGeometry(0.135, 0.013, 8, 36), toon(C.gold), glasses, x, 0, 0);
+    var lens = mesh(new THREE.CircleGeometry(0.13, 32), lensMat, glasses, x, 0, -0.005);
+    var glint = mesh(new THREE.PlaneGeometry(0.03, 0.12), basic(C.white, { transparent: true, opacity: 0.6, depthWrite: false }), glasses, x + 0.05, 0.03, 0.005);
+    glint.rotation.z = -0.6;
+  });
+  var bridge = mesh(new THREE.TorusGeometry(0.05, 0.014, 6, 16, Math.PI), toon(C.gold), glasses, 0, 0.02, 0);
+  var glint2 = null;
+
+  // soft ground shadow
+  var sc = document.createElement("canvas"); sc.width = sc.height = 128;
+  var sx = sc.getContext("2d"), gr = sx.createRadialGradient(64, 64, 4, 64, 64, 62);
+  gr.addColorStop(0, "rgba(40,20,90,0.35)"); gr.addColorStop(1, "rgba(40,20,90,0)");
+  sx.fillStyle = gr; sx.fillRect(0, 0, 128, 128);
+  var shadow = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 2.2), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false }));
+  shadow.rotation.x = -Math.PI / 2; shadow.position.y = -1.42; scene.add(shadow);
+
+  // ── Props: floating symbols per mood (canvas sprites) ───────────────────
+  function spriteTex(draw) {
+    var c = document.createElement("canvas"); c.width = c.height = 128; draw(c.getContext("2d"));
+    var t = new THREE.CanvasTexture(c); t.encoding = THREE.sRGBEncoding; return t;
+  }
+  function glyph(ch, color, px) {
+    return spriteTex(function (x) { x.font = "bold " + (px || 96) + "px Arial"; x.textAlign = "center"; x.textBaseline = "middle";
+      x.lineWidth = 10; x.strokeStyle = "#ffffff"; x.strokeText(ch, 64, 70); x.fillStyle = color; x.fillText(ch, 64, 70); });
+  }
+  var TEX = {
+    question: glyph("?", "#0a7d3b"), bang: glyph("!", "#22c447"), note: glyph("♪", "#0a7d3b"), note2: glyph("♫", "#22c447"),
+    dots: glyph("...", "#0a7d3b", 64), zz: glyph("z", "#0a7d3b", 80), ha: glyph("ha", "#22c447", 70),
+    heart: spriteTex(function (x) { x.fillStyle = "#ff4fa3"; x.beginPath(); x.moveTo(64, 112);
+      x.bezierCurveTo(8, 72, 8, 20, 40, 20); x.bezierCurveTo(56, 20, 64, 34, 64, 40);
+      x.bezierCurveTo(64, 34, 72, 20, 88, 20); x.bezierCurveTo(120, 20, 120, 72, 64, 112); x.fill(); }),
+    sparkle: spriteTex(function (x) { x.fillStyle = "#f6c945"; x.beginPath();
+      for (var k = 0; k < 8; k++) { var r = k % 2 ? 14 : 60, a = k * Math.PI / 4 - Math.PI / 2;
+        x.lineTo(64 + r * Math.cos(a), 64 + r * Math.sin(a)); } x.closePath(); x.fill(); }),
+    dot: spriteTex(function (x) { x.fillStyle = "#ffffff"; x.beginPath(); x.arc(64, 64, 50, 0, Math.PI * 2); x.fill();
+      x.lineWidth = 8; x.strokeStyle = "#7fe39a"; x.stroke(); }),
+    wave: spriteTex(function (x) { x.strokeStyle = "#0a7d3b"; x.lineWidth = 10; x.lineCap = "round";
+      [30, 52].forEach(function (r) { x.beginPath(); x.arc(30, 64, r, -0.7, 0.7); x.stroke(); }); }),
+    burst: spriteTex(function (x) { x.strokeStyle = "#f6c945"; x.lineWidth = 9; x.lineCap = "round";
+      for (var k = 0; k < 6; k++) { var a = k * Math.PI / 3; x.beginPath(); x.moveTo(64 + 22 * Math.cos(a), 64 + 22 * Math.sin(a));
+        x.lineTo(64 + 54 * Math.cos(a), 64 + 54 * Math.sin(a)); x.stroke(); } }),
+    tape: spriteTex(function (x) { x.fillStyle = "#f6c945"; x.fillRect(0, 56, 128, 16);
+      x.strokeStyle = "#5a4a12"; x.lineWidth = 2;
+      for (var i = 4; i < 128; i += 8) { x.beginPath(); x.moveTo(i, 56); x.lineTo(i, i % 32 === 4 ? 68 : 62); x.stroke(); } }),
+    swish: spriteTex(function (x) { x.strokeStyle = "#7fe39a"; x.lineWidth = 8; x.lineCap = "round";
+      [0, 22, 44].forEach(function (d) { x.beginPath(); x.arc(64, 120, 70 - d, -2.6, -1.9); x.stroke(); }); }),
+  };
+  var props = [];
+  function clearProps() { props.forEach(function (p) { scene.remove(p.s); p.s.material.dispose(); }); props = []; }
+  function addProp(tex, x, y, size, kind, phase) {
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false }));
+    s.position.set(x, y, 0.9); s.scale.set(size, size, 1); scene.add(s);
+    props.push({ s: s, x: x, y: y, size: size, kind: kind, phase: phase || 0 });
+  }
+  var speakWaves = [0, 1].map(function (i) {
+    var w = new THREE.Sprite(new THREE.SpriteMaterial({ map: TEX.wave, transparent: true, depthWrite: false, opacity: 0 }));
+    // left of the face; arcs bulge outward, away from the mouth
+    w.position.set(-0.92 - i * 0.24, 0.42 + i * 0.03, 0.9); w.scale.set(0.36 + i * 0.1, 0.36 + i * 0.1, 1);
+    w.material.rotation = Math.PI;
+    scene.add(w); return w;
+  });
+  var speaking = false, speakAmt = 0;
+  function setSpeaking(b) { speaking = !!b; }
+
+  var tear = mesh(new THREE.SphereGeometry(0.045, 16, 12), basic(0x7cc8ff, { transparent: true, opacity: 0 }), face);
+  tear.scale.set(0.8, 1.3, 0.6);
+
+  // ── Moods: target pose / face values, blended every frame ───────────────
+  // Shoulders: z = sideways (left arm out = negative, right arm out = positive; ~2.5 = straight up),
+  // x = forward (negative) / back (positive). Elbows: x < 0 bends the forearm forward / up;
+  // z bends it sideways (left: + toward the body, right: - toward the body).
+  var BASE = { browTilt: 0, browY: 0, browRaiseR: 0, eyeOpen: 1, lookX: 0, lookY: 0, mouthCurve: 0.4, mouthOpen: 0,
+    mouthWidth: 1, mouthSide: 0.3, blush: 0.12, headTilt: 0, headTurn: 0, headNod: 0, lean: 0, bounce: 0.02, bounceHz: 0.9,
+    sway: 0, hipPop: 0, glassesDown: 0, armLz: -0.14, armLx: 0.05, armRz: 0.14, armRx: 0.05, elbLx: -0.2, elbLz: 0,
+    elbRx: -0.2, elbRz: 0, wave: 0, squash: 0, jump: 0, scale: 1, shrug: 0, wink: 0, eyeRoll: 0, clap: 0, dance: 0,
+    flip: 0, push: 0, vogue: 0, snap: 0, strut: 0, kiss: 0, selfie: 0, spin: 0, facepalm: 0,
+    thumb: 0, nod: 0, shake: 0, bow: 0, point: 0, laugh: 0, yawn: 0, measure: 0 };
+  var HIP_L = { armLx: -0.09, armLz: -0.72, elbLx: 0.01, elbLz: 1.7 };
+  var HIP_R = { armRx: -0.09, armRz: 0.72, elbRx: 0.01, elbRz: -1.7 };
+  // Right-arm poses solved for a hand target (chin, cheek, mouth, ...); the left arm mirrors them.
+  var WRIST_FLICK_R = { armRx: -0.91, armRz: 0.12, elbRx: -1.88, elbRz: 0.04 };
+  var MOODS = {
+    // never standing straight: hip popped, hand on hip, the other wrist flicked, head tilted
+    idle: Object.assign({}, HIP_L, WRIST_FLICK_R, { hipPop: 0.9, headTilt: 0.1, mouthSide: 0.7, mouthCurve: 0.5,
+           eyeOpen: 0.9, sway: 0.35, glassesDown: 0.25, browRaiseR: 0.03 }),
+    hello: { mouthCurve: 0.85, mouthOpen: 0.35, blush: 0.25, armRx: 0.19, armRz: 2.54, elbRx: -0.01, elbRz: 0.33, wave: 1,
+             bounce: 0.05, headTilt: 0.08, eyeOpen: 1.05 },
+    happy: { mouthCurve: 0.95, mouthOpen: 0.3, mouthSide: 0, eyeOpen: 0.8, blush: 0.35, bounce: 0.06, bounceHz: 1.6,
+             armLz: -0.4, armRz: 0.4, elbLx: -1.0, elbRx: -1.0 },
+    excited: { mouthCurve: 1, mouthOpen: 0.8, mouthSide: 0, eyeOpen: 1.2, browY: 0.04, blush: 0.45, bounce: 0, jump: 1,
+               armLz: -2.55, armRz: 2.55, elbLx: 0, elbRx: 0, scale: 1.03 },
+    sassy: Object.assign({}, HIP_L, { armRz: 0.35, armRx: -0.75, elbRx: -1.5, elbRz: 0.35, glassesDown: 1, browRaiseR: 0.07,
+             mouthCurve: 0.45, mouthSide: 0.95, mouthWidth: 0.85, headTilt: -0.15, hipPop: 1, eyeOpen: 0.78, lookX: 0.02 }),
+    confused: { browTilt: -0.25, browRaiseR: 0.07, mouthCurve: -0.15, mouthSide: 0.7, mouthWidth: 0.75, headTilt: 0.2,
+                armRz: 2.2, armRx: -0.25, elbRz: 1.35, elbRx: 0, lookX: -0.03, lookY: 0.03, eyeOpen: 1.05 },
+    sad: { browTilt: 0.3, browY: -0.015, mouthCurve: -0.6, mouthSide: 0, mouthWidth: 0.8, eyeOpen: 0.76, lookY: -0.03,
+           lean: 0.14, headNod: 0.12, bounce: 0.01, bounceHz: 0.5, armLz: -0.04, armRz: 0.04, elbLx: 0, elbRx: 0, blush: 0, squash: 0.04 },
+    thinking: { browTilt: -0.1, browRaiseR: 0.06, mouthCurve: 0.05, mouthSide: 0.6, mouthWidth: 0.6, lookX: 0.035, lookY: 0.035,
+                headTilt: 0.1, armRx: -1.4, armRz: -0.54, elbRx: -0.88, elbRz: -0.16, armLx: -0.3, armLz: 0.6, elbLx: -1.5, elbLz: 0.45 },
+    listening: { browY: 0.03, eyeOpen: 1.08, mouthCurve: 0.5, lean: -0.08, headTilt: -0.15, armLx: 0.05, armLz: -2.38, elbLx: -0.09, elbLz: -1.13,
+                 lookX: -0.02, blush: 0.2 },
+    love: { eyeOpen: 0.42, mouthCurve: 1, mouthOpen: 0.15, mouthSide: 0, blush: 0.9, headTilt: 0.12, sway: 0.6,
+            armLx: -0.43, armLz: 0.63, elbLx: -1.36, elbLz: 0.44, armRx: -0.43, armRz: -0.63, elbRx: -1.36, elbRz: -0.44,
+            bounce: 0.04, bounceHz: 1.2 },
+    surprised: { eyeOpen: 1.3, browY: 0.07, mouthCurve: 0, mouthOpen: 1, mouthSide: 0, mouthWidth: 0.6, jump: 0.5,
+                 armLz: -1.6, armRz: 1.6, elbLz: -0.9, elbRz: 0.9, elbLx: 0, elbRx: 0, lean: -0.06, glassesDown: 0.35 },
+    proud: Object.assign({}, HIP_L, HIP_R, { eyeOpen: 0.6, mouthCurve: 0.8, mouthSide: 0.2, mouthWidth: 1.05, headTilt: -0.05,
+             scale: 1.05, blush: 0.25, lookY: 0.03, lean: -0.1 }),
+    wink: { wink: 1, mouthCurve: 0.7, mouthSide: 0.75, headTilt: 0.12, blush: 0.25, armRx: -1.42, armRz: -0.05, elbRx: -0.18, elbRz: -0.02 },
+    eyeroll: Object.assign({}, HIP_L, { eyeRoll: 1, eyeOpen: 0.85, headTilt: -0.1, headTurn: 0.18, browRaiseR: 0.05,
+             mouthSide: 0.8, mouthCurve: 0.1, mouthWidth: 0.75, hipPop: 0.6 }),
+    shrug: { shrug: 1, armRx: -0.73, armRz: -0.15, elbRx: 0.14, elbRz: 1.81, armLx: -0.73, armLz: 0.15, elbLx: 0.14, elbLz: -1.81, browY: 0.05,
+             browRaiseR: 0.03, mouthCurve: -0.1, mouthSide: 0.5, headTilt: 0.14, eyeOpen: 0.95 },
+    clap: { clap: 1, armLx: -0.94, armLz: 0.53, elbLx: -0.6, elbLz: 0.28, armRx: -0.94, armRz: -0.53, elbRx: -0.6, elbRz: -0.28, mouthCurve: 0.9,
+            mouthOpen: 0.4, mouthSide: 0, eyeOpen: 0.8, bounce: 0.03, bounceHz: 2, blush: 0.3 },
+    dance: { dance: 1, mouthCurve: 0.9, mouthOpen: 0.3, mouthSide: 0.2, eyeOpen: 0.8, blush: 0.3, elbLx: -1.3, elbRx: -1.3,
+             armLz: -0.5, armRz: 0.5, bounce: 0 },
+    hairflip: { flip: 1, armRx: -2.48, armRz: 0.08, elbRx: -0.95, elbRz: -0.01, eyeOpen: 0.6, mouthCurve: 0.6, mouthSide: 0.8,
+                headTilt: -0.12, blush: 0.25, hipPop: 0.6 },
+    cool: { push: 1, armRx: -2.15, armRz: -0.43, elbRx: -0.17, elbRz: -0.04, mouthSide: 0.85, mouthCurve: 0.5, eyeOpen: 0.82,
+            headTilt: -0.06, lookX: 0.01 },
+    // both hands frame the face, switching on the beat
+    vogue: { vogue: 1, armRx: -2.09, armRz: -0.11, elbRx: -1.0, elbRz: -0.03, armLx: -2.09, armLz: 0.11, elbLx: -1.0, elbLz: 0.03,
+             eyeOpen: 0.7, mouthSide: 0.6, mouthCurve: 0.45, glassesDown: 0.5, hipPop: 0.7, blush: 0.3 },
+    // a Z-snap with attitude
+    snap: Object.assign({}, HIP_L, { snap: 1, armRx: -2.2, armRz: 0.37, elbRx: -0.98, elbRz: 0.13, mouthSide: 0.95, mouthCurve: 0.45,
+             browRaiseR: 0.08, headTilt: -0.15, eyeOpen: 0.72, hipPop: 1 }),
+    // runway walk on the spot, chin up
+    strut: Object.assign({}, HIP_R, { strut: 1, headNod: -0.06, eyeOpen: 0.72, mouthSide: 0.8, mouthCurve: 0.4, glassesDown: 0.3,
+             armLz: -0.25, elbLx: -0.3 }),
+    // blows a kiss: hand from the lips outwards (animated), pucker, hearts
+    kiss: { kiss: 1, armRx: -1.92, armRz: -0.46, elbRx: -0.39, elbRz: -0.1, mouthWidth: 0.35, mouthCurve: 0.1, mouthOpen: 0.12,
+            mouthSide: 0, wink: 1, blush: 0.8, headTilt: 0.12 },
+    // phone up, duck face, other hand framing the face
+    selfie: { selfie: 1, armRx: -2.2, armRz: 0.09, elbRx: -0.63, elbRz: 0.08, armLx: -2.09, armLz: 0.11, elbLx: -1.0, elbLz: 0.03,
+              mouthWidth: 0.4, mouthCurve: 0.2, mouthOpen: 0.1, mouthSide: 0, headTilt: 0.18, lookX: 0.035, lookY: 0.04,
+              eyeOpen: 0.8, blush: 0.3 },
+    // a 360 twirl, arms out
+    spin: { spin: 1, armLz: -1.3, armRz: 1.3, elbLx: 0, elbRx: 0, mouthCurve: 0.95, mouthOpen: 0.35, mouthSide: 0, eyeOpen: 0.75,
+            blush: 0.35 },
+    // "I can't with this": hand over the eyes, head down, slow shake
+    facepalm: { facepalm: 1, armRx: -1.95, armRz: -0.29, elbRx: -0.77, elbRz: -0.12, headNod: 0.2, headTilt: 0.1, mouthCurve: -0.3,
+                mouthSide: 0.4, browTilt: 0.2, shrug: 0.3, lean: 0.06, eyeOpen: 0.6 },
+    // ── added 18 Nov 2026 ──
+    // thumbs up, pumped twice a beat: "this works"
+    thumbsup: Object.assign({}, HIP_L, { thumb: 1, armRx: -1.1, armRz: 0.32, elbRx: -1.55, elbRz: 0.05, mouthCurve: 0.9,
+                mouthOpen: 0.2, mouthSide: 0.3, eyeOpen: 0.85, wink: 0.6, blush: 0.25, headTilt: 0.08, hipPop: 0.5 }),
+    // a warm "yes, exactly" nod
+    nod: { nod: 1, mouthCurve: 0.8, mouthSide: 0.2, eyeOpen: 0.8, blush: 0.2, armLz: -0.25, armRz: 0.25, elbLx: -0.6, elbRx: -0.6 },
+    // "no, babe": head shake, one hand up
+    headshake: Object.assign({}, HIP_L, { shake: 1, armRx: -1.3, armRz: 0.2, elbRx: -1.4, elbRz: 0.1, browTilt: 0.15,
+                 browRaiseR: 0.05, mouthCurve: -0.2, mouthSide: 0.7, mouthWidth: 0.8, eyeOpen: 0.85, glassesDown: 0.4 }),
+    // thank-you bow: hand on the chest, the other behind
+    bow: { bow: 1, armRx: -0.95, armRz: -0.55, elbRx: -1.35, elbRz: -0.3, armLx: 0.45, armLz: -0.2, elbLx: -0.3,
+           mouthCurve: 0.7, eyeOpen: 0.5, blush: 0.3 },
+    // points at the outfit (the screen)
+    point: Object.assign({}, HIP_L, { point: 1, armRx: -0.75, armRz: 1.75, elbRx: -0.12, elbRz: 0.05, lookX: 0.035, lookY: 0.025,
+             mouthCurve: 0.7, mouthOpen: 0.15, mouthSide: 0.6, browRaiseR: 0.05, headTurn: 0.12, hipPop: 0.7 }),
+    // big laugh: head back, eyes shut, hands on the tummy, shaking
+    laugh: { laugh: 1, eyeOpen: 0.25, mouthCurve: 1, mouthOpen: 0.85, mouthSide: 0, mouthWidth: 1.1, headNod: -0.12, blush: 0.6,
+             armLx: -0.45, armLz: 0.45, elbLx: -1.2, elbLz: 0.4, armRx: -0.45, armRz: -0.45, elbRx: -1.2, elbRz: -0.4,
+             bounce: 0.04, bounceHz: 3.2 },
+    // stretch and yawn ("taking a while...")
+    yawn: { yawn: 1, armLz: -2.45, armRz: 2.45, armLx: 0.1, armRx: 0.1, elbLx: -0.5, elbRx: -0.5, elbLz: -0.6, elbRz: 0.6,
+            eyeOpen: 0.15, mouthCurve: 0, mouthWidth: 0.6, mouthSide: 0, headNod: -0.1, lean: -0.05, blush: 0 },
+    // arms wide holding a tape measure, eyes on it
+    measure: { measure: 1, armLz: -1.45, armRz: 1.45, armLx: -0.35, armRx: -0.35, elbLx: -0.15, elbRx: -0.15,
+               lookY: -0.02, mouthCurve: 0.3, mouthSide: 0.6, mouthWidth: 0.7, browRaiseR: 0.04, eyeOpen: 0.8, glassesDown: 0.45 },
+  };
+
+  // Idle fidgets: every few seconds Zayn does something extra for a moment.
+  var IDLE_FIDGETS = [
+    { dur: 2.0, pose: function () { return { armRx: -0.88, armRz: -0.55, elbRx: -1.26, elbRz: -0.23, lookX: 0.02, lookY: -0.035,
+                                             headNod: 0.1, mouthSide: 0.5, mouthCurve: 0.3 }; } },          // checks his nails
+    { dur: 1.8, pose: function () { return { push: 1, armRx: -2.15, armRz: -0.43, elbRx: -0.17, elbRz: -0.04, mouthSide: 0.85 }; } }, // glasses
+    { dur: 1.6, pose: function () { return { flip: 1, armRx: -2.48, armRz: 0.08, elbRx: -0.95, elbRz: -0.01, eyeOpen: 0.6 }; } },     // hair
+    { dur: 1.8, pose: function () { return { dance: 0.55, mouthCurve: 0.8, mouthOpen: 0.25, eyeOpen: 0.7 }; } },                    // shimmy
+    { dur: 2.2, pose: function () { var side = Math.random() < 0.5 ? -1 : 1;
+                                    return { headTurn: 0.45 * side, lookX: 0.05 * side, browRaiseR: 0.07, mouthSide: 0.9 }; } },   // dramatic look-around
+    { dur: 1.2, pose: function () { return { wink: 1, mouthSide: 0.8, mouthCurve: 0.7 }; } },                                        // wink
+    { dur: 1.5, pose: function () { return { snap: 1, armRx: -2.2, armRz: 0.37, elbRx: -0.98, elbRz: 0.13 }; } },                   // snap
+  ];
+  var fidget = null, fidgetEnd = 0, nextFidget = 2.5;
+  var POSE = {};
+  try { POSE = JSON.parse(params.get("pose") || "{}"); } catch (e) {}
+  var current = Object.assign({}, BASE), target = Object.assign({}, BASE), mood = "idle", moodStart = 0, reduced = false;
+
+  function buildProps(name) {
+    clearProps();
+    if (name === "confused") { addProp(TEX.question, 1.05, 1.55, 0.5, "float", 0); addProp(TEX.question, -1.1, 1.35, 0.36, "float", 1.7); }
+    if (name === "excited" || name === "happy" || name === "proud") {
+      [[-1.2, 1.2], [1.2, 1.45], [1.15, 0.1], [-1.15, 0.2]].forEach(function (p, i) { addProp(TEX.sparkle, p[0], p[1], 0.3, "twinkle", i * 1.3); });
+    }
+    if (name === "love") { [[-0.95, 1.1], [1.0, 1.35], [0.15, 1.85]].forEach(function (p, i) { addProp(TEX.heart, p[0], p[1], 0.38, "rise", i * 1.1); }); }
+    if (name === "thinking") { [[0.85, 1.4, 0.12], [1.08, 1.68, 0.18], [1.36, 2.0, 0.27]].forEach(function (p, i) { addProp(TEX.dot, p[0], p[1], p[2], "pulse", i * 0.6); }); }
+    if (name === "surprised") addProp(TEX.bang, 1.05, 1.55, 0.55, "pop", 0);
+    if (name === "listening") addProp(TEX.wave, -1.3, 0.85, 0.45, "pulse", 0);
+    if (name === "sassy" || name === "cool") addProp(TEX.sparkle, 0.36, 0.95, 0.2, "twinkle", 0);
+    if (name === "wink") addProp(TEX.sparkle, 0.5, 0.9, 0.24, "twinkle", 0);
+    if (name === "eyeroll") addProp(TEX.dots, 0.95, 1.5, 0.5, "float", 0);
+    if (name === "shrug") addProp(TEX.question, 0, 1.85, 0.36, "float", 0);
+    if (name === "clap") { addProp(TEX.burst, 0, 0.35, 0.42, "pop", 0); addProp(TEX.sparkle, -0.9, 1.1, 0.22, "twinkle", 1); addProp(TEX.sparkle, 0.95, 1.2, 0.25, "twinkle", 2); }
+    if (name === "dance") { addProp(TEX.note, -1.1, 1.2, 0.42, "float", 0); addProp(TEX.note2, 1.1, 1.45, 0.4, "float", 1.4); addProp(TEX.note, 1.25, 0.4, 0.3, "float", 2.6); }
+    if (name === "hairflip") { addProp(TEX.swish, 0.55, 1.6, 0.6, "pulse", 0); addProp(TEX.sparkle, -0.75, 1.55, 0.26, "twinkle", 0.7); addProp(TEX.sparkle, 0.95, 1.05, 0.2, "twinkle", 1.9); }
+    if (name === "vogue" || name === "spin") {
+      [[-1.15, 1.45], [1.15, 1.6], [-1.2, 0.2], [1.2, 0.35]].forEach(function (p, i) { addProp(TEX.sparkle, p[0], p[1], 0.28, "twinkle", i * 0.9); });
+    }
+    if (name === "snap") { addProp(TEX.burst, 1.05, 1.35, 0.42, "pulse", 0); addProp(TEX.sparkle, 1.25, 1.75, 0.22, "twinkle", 0.5); }
+    if (name === "kiss") { [[0.9, 0.7], [1.15, 1.05], [0.75, 1.35]].forEach(function (p, i) { addProp(TEX.heart, p[0], p[1], 0.32, "rise", i * 0.7); }); }
+    if (name === "selfie") { addProp(TEX.burst, 1.0, 1.55, 0.5, "pulse", 0); }
+    if (name === "facepalm") { addProp(TEX.dots, -0.9, 1.5, 0.5, "float", 0); }
+    if (name === "strut") { addProp(TEX.sparkle, -1.1, 0.0, 0.22, "twinkle", 0); addProp(TEX.sparkle, 1.1, -0.3, 0.2, "twinkle", 1.2); }
+    if (name === "thumbsup") { addProp(TEX.sparkle, 1.05, 1.25, 0.3, "twinkle", 0); addProp(TEX.sparkle, 1.3, 0.75, 0.2, "twinkle", 1.1); }
+    if (name === "bow") { addProp(TEX.heart, -0.95, 1.2, 0.3, "rise", 0); }
+    if (name === "point") { addProp(TEX.burst, 1.5, 1.35, 0.4, "pulse", 0); }
+    if (name === "laugh") { addProp(TEX.ha, -1.0, 1.05, 0.4, "float", 0); addProp(TEX.ha, 1.05, 1.3, 0.34, "float", 1.3); }
+    if (name === "yawn") { [[0.8, 1.0, 0.24], [1.0, 1.25, 0.3], [1.22, 1.5, 0.36]].forEach(function (p, i) { addProp(TEX.zz, p[0], p[1], p[2], "float", i * 0.8); }); }
+    if (name === "measure") { addProp(TEX.tape, 0, 0.18, 2.6, "still", 0); }
+  }
+
+  function setMood(name) {
+    if (!MOODS[name]) name = "idle";
+    mood = name; moodStart = clock; target = Object.assign({}, BASE, MOODS[name], POSE); buildProps(name);
+    fidget = null; nextFidget = clock + 2.5 + Math.random() * 2;
+  }
+  function setReducedMotion(b) { reduced = !!b; }
+
+  // ── Animation ────────────────────────────────────────────────────────────
+  var clock = 0, last = performance.now(), running = true, nextBlink = 2.5, blinkT = -1, frameAccum = 0;
+  function lerp(a, b, t) { return a + (b - a) * t; }
+  function pulse(t, period, len) { var p = (t % period) / len; return p < 1 ? Math.sin(p * Math.PI) : 0; }  // 0..1..0 once per period
+
+  function update(dt) {
+    clock += dt;
+    // Idle never stands still: now and then a fidget, then back to the hip-popped rest.
+    if (mood === "idle" && !STILL && !reduced) {
+      if (fidget && clock > fidgetEnd) {
+        fidget = null; target = Object.assign({}, BASE, MOODS.idle, POSE); nextFidget = clock + 2.5 + Math.random() * 3;
+      } else if (!fidget && clock > nextFidget) {
+        fidget = IDLE_FIDGETS[Math.floor(Math.random() * IDLE_FIDGETS.length)];
+        fidgetEnd = clock + fidget.dur; moodStart = clock;
+        target = Object.assign({}, BASE, MOODS.idle, fidget.pose(), POSE);
+      }
+    }
+    var k = 1 - Math.pow(0.0015, dt);   // smooth blend toward the mood's targets
+    for (var p in target) current[p] = lerp(current[p], target[p], k);
+    var c = current, motion = reduced ? 0.25 : 1, t = clock - moodStart;
+
+    // body: breathing, bounce / jump, sway, hip pop, dance
+    var breath = Math.sin(clock * 2.1) * 0.01 * motion;
+    var bounce = Math.abs(Math.sin(clock * Math.PI * c.bounceHz)) * c.bounce * motion;
+    var jump = c.jump > 0.01 ? Math.max(0, Math.sin(clock * 5.2)) * 0.3 * c.jump * motion : 0;
+    var beat = clock * Math.PI * 2.1;                 // dance tempo (~126 bpm)
+    var danceBob = Math.abs(Math.sin(beat)) * 0.08 * c.dance * motion;
+    root.position.y = bounce + jump + danceBob;
+    root.position.x = Math.sin(clock * 1.8) * 0.05 * c.sway * motion + c.hipPop * 0.06 + Math.sin(beat / 2) * 0.1 * c.dance * motion;
+    var squash = 1 - c.squash + (jump > 0.05 ? 0.03 : 0) - breath;
+    body.scale.set(c.scale * (1 + (1 - squash) * 0.5), c.scale * squash, c.scale);
+    body.rotation.z = Math.sin(clock * 1.8) * 0.06 * c.sway * motion - c.hipPop * 0.08 + Math.sin(beat / 2) * 0.12 * c.dance * motion;
+    body.rotation.x = c.lean;
+    torso.rotation.z = c.hipPop * 0.1 - Math.sin(beat / 2) * 0.08 * c.dance * motion;
+    torso.position.y = 0.45 + c.shrug * 0.0;
+    legL.rotation.x = Math.sin(beat) * 0.25 * c.dance * motion; legR.rotation.x = -legL.rotation.x;
+    legL.rotation.z = -0.04 - c.hipPop * 0.05; legR.rotation.z = 0.04 - c.hipPop * 0.05;
+
+    // head: tilt, turn, nod, hair flip, shrug sink
+    var flipK = c.flip > 0.05 ? pulse(t, 2.4, 0.7) * c.flip * motion : 0;
+    head.rotation.z = c.headTilt + Math.sin(clock * 0.7) * 0.015 * motion + flipK * 0.35 + Math.sin(beat) * 0.06 * c.dance * motion;
+    head.rotation.y = c.headTurn + (mood === "idle" ? Math.sin(clock * 0.37) * 0.12 * motion : 0);
+    head.rotation.x = c.headNod - flipK * 0.25;
+    head.position.y = 0.8 - c.shrug * 0.07;
+    fringe.rotation.z = flipK * 0.5; fringe.position.x = flipK * 0.06;
+    hairGroup.rotation.z = flipK * 0.12;
+    shadow.scale.setScalar(1 - (bounce + jump + danceBob) * 0.8);
+
+    // eyes: open / squint, look around, blink, wink, eye roll
+    var look = mood === "idle" ? Math.sin(clock * 0.45) * 0.02 * motion : 0;
+    if (clock > nextBlink && blinkT < 0) blinkT = 0;
+    var blink = 0;
+    if (blinkT >= 0) { blinkT += dt; blink = Math.sin(Math.min(1, blinkT / 0.16) * Math.PI);
+      if (blinkT > 0.16) { blinkT = -1; nextBlink = clock + 2 + Math.random() * 3; } }
+    var roll = c.eyeRoll > 0.05 ? (t % 3.2) / 1.2 : 2;
+    var rollX = roll < 1 ? -Math.cos(roll * Math.PI) * 0.04 : 0.0, rollY = roll < 1 ? Math.sin(roll * Math.PI) * 0.04 + 0.025 : 0.035;
+    [eyeL, eyeR].forEach(function (e, i) {
+      e.white.scale.y = 1.1 * Math.max(0.25, Math.min(1.25, c.eyeOpen));
+      var lx = c.lookX + look + rollX * c.eyeRoll, ly = c.lookY + rollY * c.eyeRoll;
+      e.iris.position.set(lx, ly, 0.04);
+      e.iris.scale.setScalar(c.eyeOpen > 1.15 ? 0.88 : 1); e.iris.scale.z = 0.4;
+      var winkClose = i === 0 ? c.wink : 0;
+      var closed = Math.min(1, Math.max(0, 1.05 - c.eyeOpen) * 1.15 + blink + winkClose);
+      e.lash.material.opacity = Math.max(0, (closed - 0.75) / 0.25);
+      e.lid.rotation.x = closed < 0.6 ? lerp(-1.75, -0.2, closed / 0.6) : lerp(-0.2, 1.45, (closed - 0.6) / 0.4);
+    });
+
+    // brows
+    [browL, browR].forEach(function (b, i) {
+      var side = b.userData.side, raise = side > 0 ? c.browRaiseR : 0;
+      b.position.y = 0.24 + c.browY + raise + (c.eyeOpen - 1) * 0.08 - (i === 0 ? c.wink * 0.03 : 0) + c.eyeRoll * 0.015;
+      b.rotation.z = -side * c.browTilt;  // browTilt > 0: inner ends up (worried / sad)
+    });
+
+    // mouth, blush (+ talking: the mouth opens and closes in syllable rhythm)
+    speakAmt = lerp(speakAmt, speaking ? 1 : 0, k);
+    var talk = speakAmt * (0.3 + 0.6 * Math.abs(Math.sin(clock * 13.5) * Math.sin(clock * 5.1 + 1.3)));
+    setMouth(c.mouthCurve, c.mouthWidth, c.mouthSide * (1 - speakAmt * 0.6));
+    var open = Math.max(c.mouthOpen, talk);
+    mouthOpenMesh.scale.y = 0.01 + open * 0.75;
+    teeth.visible = open > 0.25 && c.mouthCurve > 0.3;
+    tongue.visible = open > 0.35;
+    speakWaves.forEach(function (w, i) {
+      var pl = 0.5 + 0.5 * Math.sin(clock * 7 - i * 1.2);
+      w.material.opacity = speakAmt * (0.35 + 0.65 * pl);
+      var s = (0.36 + i * 0.1) * (0.9 + 0.15 * pl);
+      w.scale.set(s, s, 1);
+    });
+    blushL.material.opacity = blushR.material.opacity = Math.min(0.8, c.blush * 0.8);
+
+    // glasses: on the eyes; slide down the nose (peek over) when sassy; pushed up when "cool"
+    var pushK = c.push > 0.05 ? pulse(t, 2.6, 0.9) * c.push * motion : 0;
+    glasses.position.set(0, 0.04 - c.glassesDown * 0.09 + pushK * 0.03 - (c.push > 0.05 ? (1 - pushK) * 0.03 * c.push : 0), 0.62 + c.glassesDown * 0.02);
+    glasses.rotation.x = c.glassesDown * 0.12;
+
+    // arms (wave: the right forearm swings; clap: hands meet; dance: alternate pumps; shrug: shoulders up)
+    var wave = c.wave > 0.05 ? Math.sin(clock * 9) * 0.45 * c.wave * motion : 0;
+    var clapK = c.clap > 0.05 ? (0.5 + 0.5 * Math.sin(clock * 13)) * c.clap * motion : 0;
+    var pumpL = Math.sin(beat) * 0.7 * c.dance * motion, pumpR = -pumpL;
+    var sh = c.shrug * 0.09;
+    armL.shoulder.position.y = 0.1 + sh; armR.shoulder.position.y = 0.1 + sh;
+    armL.shoulder.rotation.set(c.armLx + pumpL, 0, c.armLz + Math.sin(clock * 2.1) * 0.025 * motion - clapK * 0.3);
+    armR.shoulder.rotation.set(c.armRx + pumpR, 0, c.armRz - Math.sin(clock * 2.1) * 0.025 * motion + clapK * 0.3);
+    armL.elbow.rotation.set(c.elbLx, 0, c.elbLz);
+    armR.elbow.rotation.set(c.elbRx - pushK * 0.25, 0, c.elbRz + wave);
+    if (mood === "excited") { armL.shoulder.rotation.z -= Math.sin(clock * 10) * 0.18 * motion; armR.shoulder.rotation.z += Math.sin(clock * 10) * 0.18 * motion; }
+    if (c.flip > 0.05) armR.elbow.rotation.z += flipK * 0.5;
+
+    // vogue: the framing hands switch height on the beat, head snaps with them
+    if (c.vogue > 0.05) {
+      var vb = Math.sin(clock * 5) > 0 ? 1 : -1;
+      armR.shoulder.rotation.x += 0.18 * vb * c.vogue * motion; armL.shoulder.rotation.x -= 0.18 * vb * c.vogue * motion;
+      head.rotation.z += 0.1 * vb * c.vogue * motion;
+    }
+    // snap: the hand traces a Z, then snaps
+    if (c.snap > 0.05) {
+      var zt = (clock % 1.4) / 1.4, zz, zx;
+      if (zt < 0.33) { zz = lerp(0.35, -0.35, zt / 0.33); zx = 0; }
+      else if (zt < 0.66) { zz = lerp(-0.35, 0.35, (zt - 0.33) / 0.33); zx = lerp(0, 0.35, (zt - 0.33) / 0.33); }
+      else { zz = lerp(0.35, -0.35, (zt - 0.66) / 0.34); zx = 0.35; }
+      armR.shoulder.rotation.z += zz * c.snap * motion; armR.shoulder.rotation.x += zx * c.snap * motion;
+    }
+    // kiss: from the lips (pucker) outwards, again and again
+    if (c.kiss > 0.05) {
+      var kk = pulse(clock, 1.8, 1.2) * motion, w = c.kiss;
+      armR.shoulder.rotation.x = lerp(armR.shoulder.rotation.x, lerp(-1.92, -1.54, kk), w);
+      armR.shoulder.rotation.z = lerp(armR.shoulder.rotation.z, lerp(-0.46, 0.12, kk), w);
+      armR.elbow.rotation.x = lerp(armR.elbow.rotation.x, lerp(-0.39, -1.06, kk), w);
+      armR.elbow.rotation.z = lerp(armR.elbow.rotation.z, lerp(-0.1, 0.11, kk), w);
+    }
+    // strut: runway steps, swinging arm, hips side to side
+    if (c.strut > 0.05) {
+      var sb = clock * Math.PI * 1.8, st = c.strut * motion;
+      legL.rotation.x += Math.sin(sb) * 0.35 * st; legR.rotation.x -= Math.sin(sb) * 0.35 * st;
+      root.position.x += Math.sin(sb) * 0.08 * st; root.position.y += Math.abs(Math.sin(sb)) * 0.04 * st;
+      body.rotation.z += Math.sin(sb) * 0.09 * st; torso.rotation.y = Math.sin(sb) * 0.12 * st;
+      armL.shoulder.rotation.x += Math.sin(sb) * 0.5 * st;
+    } else { torso.rotation.y = 0; }
+    // spin: a full twirl every 2.6 s
+    if (c.spin > 0.5 && !reduced) {
+      var sp = (t % 2.6) / 0.9;
+      root.rotation.y = sp < 1 ? (1 - Math.cos(sp * Math.PI)) / 2 * Math.PI * 2 : 0;
+    } else { root.rotation.y = 0; }
+    // facepalm: slow "no no no" head shake
+    if (c.facepalm > 0.05) head.rotation.y += Math.sin(clock * 3) * 0.12 * c.facepalm * motion;
+    // selfie: the phone appears in the hand
+    phone.visible = c.selfie > 0.5;
+    // thumbs up: the arm pumps
+    if (c.thumb > 0.05) armR.shoulder.rotation.x -= pulse(clock, 1.1, 0.45) * 0.22 * c.thumb * motion;
+    // nod: yes yes yes
+    if (c.nod > 0.05) head.rotation.x += Math.sin(clock * 7) * 0.13 * c.nod * motion;
+    // head shake: no no no, the raised finger wags with it
+    if (c.shake > 0.05) { head.rotation.y += Math.sin(clock * 8) * 0.24 * c.shake * motion;
+                          armR.elbow.rotation.z += Math.sin(clock * 8) * 0.25 * c.shake * motion; }
+    // bow: down, hold, up, every 2.8 s
+    if (c.bow > 0.05) { var bw = pulse(t, 2.8, 1.6) * c.bow * motion; body.rotation.x += bw * 0.5; head.rotation.x += bw * 0.2; }
+    // point: a little jab toward the screen
+    if (c.point > 0.05) armR.shoulder.rotation.x -= pulse(clock, 1.3, 0.35) * 0.12 * c.point * motion;
+    // laugh: the whole body shakes, head bobs
+    if (c.laugh > 0.05) { var lg = Math.sin(clock * 14) * c.laugh * motion;
+                          head.rotation.z += lg * 0.05; torso.rotation.z += lg * 0.04; root.position.y += Math.abs(lg) * 0.02; }
+    // yawn: the mouth opens wide and slowly closes again
+    if (c.yawn > 0.05) { var yw = pulse(t, 3.6, 2.2) * c.yawn; mouthOpenMesh.scale.y = Math.max(mouthOpenMesh.scale.y, 0.01 + yw * 0.9);
+                         tongue.visible = tongue.visible || yw > 0.4; }
+    // measure: the tape breathes a little, the hands with it
+    if (c.measure > 0.05) { var ms = Math.sin(clock * 1.6) * 0.06 * c.measure * motion;
+                            armL.shoulder.rotation.z -= ms; armR.shoulder.rotation.z += ms; }
+
+    // tear (sad)
+    var tearOn = mood === "sad";
+    tear.material.opacity = lerp(tear.material.opacity, tearOn ? 0.9 : 0, k);
+    var tp = (clock * 0.6) % 1;
+    tear.position.set(-0.27, -0.06 - tp * 0.3, 0.55);
+
+    // props
+    props.forEach(function (p) {
+      var ph = clock * 2 + p.phase, m = p.s.material, s = p.size;
+      if (p.kind === "float") { p.s.position.y = p.y + Math.sin(ph) * 0.1 * motion; m.rotation = Math.sin(ph * 0.7) * 0.25; }
+      if (p.kind === "twinkle") { s = p.size * (0.6 + 0.4 * Math.abs(Math.sin(ph * 1.4))); m.rotation = ph * 0.5; }
+      if (p.kind === "rise") { var r = ((clock * 0.35 + p.phase) % 1); p.s.position.y = p.y + r * 0.6 * motion; m.opacity = 1 - r; }
+      if (p.kind === "pulse") { s = p.size * (0.85 + 0.15 * Math.sin(ph * 2)); }
+      if (p.kind === "pop") { s = p.size * Math.min(1, t * 4) * (1 + 0.1 * Math.sin(ph * 3)); }
+      p.s.scale.set(s, s, 1);
+    });
+  }
+
+  function resize() {
+    var w = window.innerWidth || 300, h = window.innerHeight || 300;
+    renderer.setSize(w, h, false); camera.aspect = w / h;
+    // keep the whole character in view in wide or tall boxes
+    var z = w / h < 0.8 ? CAM.z / (w / h) * 0.8 : CAM.z;
+    camera.position.set(0, CAM.y, z); camera.lookAt(0, CAM.look, 0);
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener("resize", resize); resize();
+
+  function loop(now) {
+    if (!running) return;
+    var dt = Math.min(0.05, (now - last) / 1000); last = now;
+    frameAccum += dt;
+    if (frameAccum >= 1 / 40) {   // ~40 fps is smooth enough and easier on the battery
+      update(frameAccum); renderer.render(scene, camera); frameAccum = 0;
+    }
+    requestAnimationFrame(loop);
+  }
+
+  window.zayn = {
+    setMood: setMood,
+    setReducedMotion: setReducedMotion,
+    setSpeaking: setSpeaking,
+    pause: function () { running = false; },
+    resume: function () { if (!running) { running = true; last = performance.now(); requestAnimationFrame(loop); } },
+    mood: function () { return mood; },
+    moods: function () { return Object.keys(MOODS); },
+  };
+  window.addEventListener("message", function (e) {
+    var d = e.data || {};
+    if (d.zayn === "setMood") setMood(d.mood);
+    if (d.zayn === "reduced") setReducedMotion(d.value);
+    if (d.zayn === "speaking") setSpeaking(d.value);
+    if (d.zayn === "pause" || d.mascot === "pause") window.zayn.pause();
+    if (d.zayn === "resume" || d.mascot === "resume") window.zayn.resume();
+  });
+  document.addEventListener("visibilitychange", function () { document.hidden ? window.zayn.pause() : window.zayn.resume(); });
+
+  setMood(params.get("mood") || "hello");
+  if (params.get("speaking") === "1") { setSpeaking(true); speakAmt = 1; }
+  if (STILL) {
+    // deterministic frame for previews: snap to the mood, advance to time t,
+    // after the page has its final size
+    running = false;
+    setTimeout(function () {
+    resize();
+    current = Object.assign({}, target); nextBlink = 1e9;
+    var tStill = parseFloat(params.get("t") || "1.2");
+    for (var s = 0; s < Math.round(tStill / 0.025); s++) update(0.025);
+    renderer.render(scene, camera);
+    // headless screenshots don't capture WebGL canvases: show the frame as an image
+    var img = new Image(); img.src = renderer.domElement.toDataURL("image/png");
+    img.style.cssText = "width:100%;height:100%;display:block";
+    renderer.domElement.style.display = "none"; document.body.appendChild(img);
+    document.body.dataset.ready = "1";
+    }, 300);
+  } else {
+    requestAnimationFrame(loop);
+  }
+  notify("ready");
+})();
+</script>
+</body>
+</html>

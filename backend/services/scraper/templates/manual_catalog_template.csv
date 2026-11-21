@@ -1,0 +1,2 @@
+name,product_url,image_url,extra_image_urls,price,sizes_in_stock,all_sizes,category,tryon_category,gender,colors
+EXAMPLE - delete this row,https://www.breakout.com.pk/products/example-handle,https://cdn.shopify.com/s/files/1/0202/5884/8822/files/EXAMPLE_1.jpg,https://cdn.shopify.com/s/files/1/0202/5884/8822/files/EXAMPLE_2.jpg,2999,S|M|L,XS|S|M|L|XL,t-shirts,upper,men,Black

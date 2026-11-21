@@ -1,0 +1,54 @@
+# Local cluster (minikube / k3s / Docker Desktop Kubernetes) — what you demo.
+#   cp secrets.env.example secrets.env   # fill in real values (gitignored)
+#   kubectl apply -k k8s/overlays/local
+# Images are the ones built by `docker compose build` (tag: dev).
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+images:
+  - name: smartfit/gateway
+    newTag: dev
+  - name: smartfit/cv-analysis
+    newTag: dev
+  - name: smartfit/recommendation
+    newTag: dev
+  - name: smartfit/scraper
+    newTag: dev
+  - name: smartfit/chat-orchestrator
+    newTag: dev
+  - name: smartfit/tryon
+    newTag: dev
+  - name: smartfit/hairstyle
+    newTag: dev
+  - name: smartfit/scoring
+    newTag: dev
+
+secretGenerator:
+  - name: smartfit-secrets
+    envs:
+      - secrets.env
+generatorOptions:
+  disableNameSuffixHash: true
+
+patches:
+  # Expose the gateway on the node at :30080 for the mobile app / emulator.
+  - target:
+      kind: Service
+      name: gateway
+    patch: |-
+      - op: add
+        path: /spec/type
+        value: NodePort
+      - op: add
+        path: /spec/ports/0/nodePort
+        value: 30080
+  # Use locally built images without pulling from a registry.
+  - target:
+      kind: Deployment
+    patch: |-
+      - op: add
+        path: /spec/template/spec/containers/0/imagePullPolicy
+        value: IfNotPresent

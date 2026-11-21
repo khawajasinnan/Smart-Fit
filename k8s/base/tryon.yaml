@@ -1,0 +1,64 @@
+# Virtual try-on scaffold (SFR-026..028) - GPU in production
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tryon
+  labels:
+    app.kubernetes.io/name: tryon
+    app.kubernetes.io/part-of: smartfit
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: tryon
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: tryon
+        app.kubernetes.io/part-of: smartfit
+    spec:
+      containers:
+        - name: tryon
+          image: smartfit/tryon
+          ports:
+            - name: http
+              containerPort: 8005
+          envFrom:
+            - configMapRef:
+                name: smartfit-config
+            - secretRef:
+                name: smartfit-secrets
+                optional: true
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tryon
+  labels:
+    app.kubernetes.io/name: tryon
+    app.kubernetes.io/part-of: smartfit
+spec:
+  selector:
+    app.kubernetes.io/name: tryon
+  ports:
+    - name: http
+      port: 8005
+      targetPort: http

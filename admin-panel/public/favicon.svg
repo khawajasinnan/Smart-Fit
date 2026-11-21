@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="23" fill="#C8F53C"/>
+<path d="M30 52 C22 38 15 32 12 22" fill="none" stroke="#17142B" stroke-width="2.6" stroke-linecap="round"/>
+<g transform="rotate(-12 50 52)">
+  <path d="M33 33 H77 Q83 33 83 39 V65 Q83 71 77 71 H33 L19 52 Z" fill="#FF2E93" stroke="#17142B" stroke-width="3"
+        stroke-linejoin="round" transform="translate(3.5 3.5)"/>
+  <path fill-rule="evenodd" d="M33 33 H77 Q83 33 83 39 V65 Q83 71 77 71 H33 L19 52 Z M31 52 m-4 0 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0 Z"
+        fill="#6C4CE0" stroke="#17142B" stroke-width="3" stroke-linejoin="round"/>
+  <text x="58" y="59" text-anchor="middle" font-family="Unbounded, Arial Black, sans-serif" font-weight="800" font-size="19"
+        fill="#FFFFFF" letter-spacing="-0.5">fit</text>
+</g>
+<path d="M80 14 Q81.2 19.5 86.5 20.7 Q81.2 21.9 80 27.4 Q78.8 21.9 73.5 20.7 Q78.8 19.5 80 14 Z" fill="#17142B"/>
+</svg>

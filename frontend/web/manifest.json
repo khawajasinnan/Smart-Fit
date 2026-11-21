@@ -1,0 +1,35 @@
+{
+    "name": "SmartFit",
+    "short_name": "SmartFit",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#0E0A18",
+    "theme_color": "#6C4CE0",
+    "description": "SmartFit: your AI fashion stylist for Pakistan.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/Icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/Icon-maskable-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}

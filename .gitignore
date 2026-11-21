@@ -1,54 +1,124 @@
-# Miscellaneous
+# ─────────────────────────────────────────────────────────────
+# SmartFit monorepo — root .gitignore
+# ─────────────────────────────────────────────────────────────
+
+# ── Secrets & environment (never commit real keys) ───────────
+.env
+.env.*
+!.env.example
+frontend/env/*
+!frontend/env/env.example.json
+k8s/overlays/*/secrets.env
+# loose notes holding OAuth / Kaggle credentials
+Client.txt
+New Text Document.txt
+
+# ── Kept on this PC only, never on GitHub (the user's choice, 21 Nov 2026) ──
+docs/
+supabase/migrations/
+CLAUDE.md
+
+# ── Large data & model artefacts ─────────────────────────────
+datasets/
+*.zip
+backend/services/tryon/lora/checkpoints/*
+!backend/services/tryon/lora/checkpoints/.gitkeep
+backend/services/recommendation/cache/*
+!backend/services/recommendation/cache/.gitkeep
+# OpenPose (~200 MB): fetched by backend/scripts/download_cv_models.py
+backend/services/cv_analysis/models/*.onnx
+backend/services/cv_analysis/models/*.pth
+backend/services/cv_analysis/models/*.part
+
+# ── Python ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.venv-*/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# ── Flutter / Dart / Pub ─────────────────────────────────────
+.dart_tool/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+.fvm/
+**/doc/api/
+**/ios/Flutter/.last_build_id
+.pub-cache/
+.pub/
+app.*.symbols
+app.*.map.json
+**/android/app/debug
+**/android/app/profile
+**/android/app/release
+**/android/.kotlin/
+
+# ── Admin panel (web) ────────────────────────────────────────
+admin-panel/node_modules/
+admin-panel/dist/
+*.tsbuildinfo
+
+# ── IDE / OS / misc ──────────────────────────────────────────
+.DS_Store
+Thumbs.db
 *.class
 *.log
-*.pyc
 *.swp
-.DS_Store
 .atom/
 .build/
 .buildlog/
-.history
+.history/
 .svn/
 .swiftpm/
 migrate_working_dir/
 .agents/
 .codex/
-.env
-.env.*
-.env.example
-.venv
-venv
-.env
-assets
-datasets
-# IntelliJ related
+.idea/
 *.iml
 *.ipr
 *.iws
-.idea/
+# .vscode/ is intentionally tracked (shared launch configuration).
 
-# The .vscode folder contains launch configuration and tasks you configure in
-# VS Code which you may wish to be included in version control, so this line
-# is commented out by default.
-#.vscode/
+# Local catalog snapshot + FashionCLIP embedding cache (regenerable)
+backend/data/
+backend/services/recommendation/cache/*
+!backend/services/recommendation/cache/.gitkeep
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins-dependencies
-.pub-cache/
-.pub/
-/build/
-/coverage/
+# Try-on model weights downloaded by backend/services/tryon/download_model.py (~19 GB)
+backend/services/tryon/model/
 
-# Symbolication related
-app.*.symbols
+# Hairstyle service: downloaded models and the CelebAMask-HQ cut-outs (non-commercial dataset, never committed)
+backend/services/hairstyle/models/
+# Self-learning runtime files (spec §23.26): the live models are committed,
+# their version archive, attempt history and lock are per-deployment
+backend/services/recommendation/ml/models/versions/
+backend/services/recommendation/ml/models/history.json
+backend/services/scoring/models/versions/
+backend/services/scoring/models/history.json
+**/models/.retrain.lock
+**/models/.*.tmp
+backend/services/scoring/models/weights.json
+backend/services/hairstyle/catalog/*.png
+backend/services/hairstyle/catalog/index.json
 
-# Obfuscation related
-app.*.map.json
+# Built app packages (237 MB debug APK at the repo root; rebuild with flutter build apk)
+*.apk
+*.aab
 
-# Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# gender checks (18 Nov 2026): training cache + dataset-derived models (regenerate: scripts/train_gender_checks.py)
+backend/.cache/
+backend/services/recommendation/models/gender/
+
+# Playwright end-to-end tests (20 Nov 2026): logins, installs and reports stay local
+e2e/.env.local
+e2e/node_modules/
+e2e/test-results/
+e2e/playwright-report/
+e2e/.auth/
+e2e/screens/
+e2e/*.log

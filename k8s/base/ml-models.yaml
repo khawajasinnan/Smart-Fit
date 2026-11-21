@@ -1,0 +1,26 @@
+# Persistent model folders for self-learning (spec §23.26): models the
+# services learn from real users survive restarts and redeploys. One writer
+# each (the services run 1 replica with the Recreate strategy).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: recommendation-models
+  labels:
+    app.kubernetes.io/part-of: smartfit
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: scoring-models
+  labels:
+    app.kubernetes.io/part-of: smartfit
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 512Mi

@@ -1,0 +1,31 @@
+# Non-secret configuration shared by every SmartFit service.
+# Secrets (Supabase keys, Gemini key) go in the `smartfit-secrets` Secret —
+# generated from secrets.env in overlays/local, pre-created in production.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smartfit-config
+data:
+  # Gateway -> internal services (cluster DNS)
+  CV_ANALYSIS_URL: "http://cv-analysis:8001"
+  RECOMMENDATION_URL: "http://recommendation:8002"
+  CHAT_ORCHESTRATOR_URL: "http://chat-orchestrator:8004"
+  TRYON_URL: "http://tryon:8005"
+  HAIRSTYLE_URL: "http://hairstyle:8006"
+  SCORING_URL: "http://scoring:8007"
+  # Recommendation -> scraper
+  SCRAPER_URL: "http://scraper:8003"
+  # Behaviour
+  AUTH_REQUIRED: "true"
+  ADMIN_EMAILS: "admin@smartfit.pk"
+  CORS_ORIGINS: "*"
+  DEBUG: "false"
+  GEMINI_MODEL: "gemini-2.5-flash"
+  # Self-learning from real users (spec §23.26): check for new feedback every
+  # 24 h; retrain with >= 50 new loves/"not for me" (>= 20 look ratings); a new
+  # model goes live only if it is at least as good on held-out real feedback.
+  AUTO_RETRAIN_HOURS: "24"
+  AUTO_RETRAIN_MIN_FEEDBACK: "50"
+  AUTO_RETRAIN_MIN_LOOK_RATINGS: "20"
+  IMPRESSION_LOGGING_ENABLED: "true"
+  IMPRESSION_RETENTION_DAYS: "180"

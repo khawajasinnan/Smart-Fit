@@ -1,0 +1,10 @@
+# Keep build contexts small — never send local envs, caches or datasets to Docker.
+venv/
+.venv/
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+.ruff_cache/
+*.zip
+.env
+.env.*
